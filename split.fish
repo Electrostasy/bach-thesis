@@ -9,5 +9,5 @@ argparse $options -- $argv or exit 1
 # iconv -f ISO_8859-1 -t UTF-8 -o "$_flag_i.utf8"
 
 set -l length (wc -l $_flag_i | cut -d' ' -f1)
-head -n (math -s 0 "$length * $_flag_t") $_flag_i > 'training.txt'
-tail -n (math -s 0 "$length * $_flag_w") $_flag_i > 'wordlist.txt'
+head -n (math -s 0 $length x $_flag_t) $_flag_i > "$(echo (string split -r -m1 . $_flag_i)[1])_training.txt"
+tail -n (math -s 0 $length x $_flag_w) $_flag_i > "$(echo (string split -r -m1 . $_flag_i)[1])_testing.txt"
