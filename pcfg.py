@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from enum import Enum
 from getopt import getopt
-from re import compile
+from regex import compile
 from typing import Set, Any, Iterator
 import heapq
 import pickle
@@ -30,7 +30,7 @@ class Token:
         ALPHA = "A"
         SYMBOL = "S"
 
-    _PATTERN = compile(r"[a-zA-Z]+|\d+|\W+")
+    _PATTERN = compile(r"\p{Letter}{1,}|\p{Number}{1,}|\p{Punctuation}{1,}")
 
     def __init__(self, text: str) -> None:
         self.length = len(text)
