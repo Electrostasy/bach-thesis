@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from enum import Enum
+from functools import reduce
 from getopt import getopt
 from regex import compile
 from typing import Set, Any, Iterator
@@ -30,7 +31,7 @@ class Token:
         ALPHA = "A"
         SYMBOL = "S"
 
-    _PATTERN = compile(r"\p{Letter}{1,}|\p{Number}{1,}|\p{Punctuation}{1,}")
+    _PATTERN = compile(r"\p{L}{1,}|[0-9]{1,}|\p{P}{1,}")
 
     def __init__(self, text: str) -> None:
         self.length = len(text)
@@ -114,74 +115,129 @@ class PCFG:
         frequency = item.frequency
 
         # Append new derivatives of this value
+        digit_freqs = {}
+        symbol_freqs = {}
+        alpha_freqs = {}
         for idx, _ in enumerate(preterm[pivot:]):
             match (token := grammar.tokens[idx]).category:
                 case Token.Category.ALPHA:
-                    # We are not substituting alphas, skip to next token
-                    continue
+                    # We are substituting this alpha, set pivot to idx
+                    pivot = idx
+
+                    # # Pre-assign this digit's frequency if we push later and
+                    # # don't assign a new digit
+                    # alpha_freqs[idx] = self.alphas[token][0][preterm[idx]]
+
+                    # Try to get a new digit
+                    alphas = list(self.alphas[token][0].keys())
+                    preterm_idx = preterm[pivot][1] + 1
+                    if preterm_idx >= len(alphas):
+                        # Digit counter exceeds length of available digits,
+                        # skip this iteration to next token
+                        continue
+
+                    # Assign new digit and digit frequency
+                    new_alpha = alphas[preterm_idx]
+                    preterm[pivot] = new_alpha, preterm_idx
+                    alpha_freqs[idx] = self.alphas[token][0][new_alpha]
                 case Token.Category.DIGIT:
                     # We are substituting this digit, set pivot to idx
                     pivot = idx
+
+                    # # Pre-assign this digit's frequency if we push later and
+                    # # don't assign a new digit
+                    # digit_freqs[idx] = self.digits[token][0][preterm[idx]]
+
+                    # Try to get a new digit
                     digits = list(self.digits[token][0].keys())
                     preterm_idx = preterm[pivot][1] + 1
                     if preterm_idx >= len(digits):
                         # Digit counter exceeds length of available digits,
                         # skip this iteration to next token
                         continue
-                    preterm[pivot] = digits[preterm_idx], preterm_idx
+
+                    # Assign new digit and digit frequency
+                    new_digit = digits[preterm_idx]
+                    preterm[pivot] = new_digit, preterm_idx
+                    digit_freqs[idx] = self.digits[token][0][new_digit]
                 case Token.Category.SYMBOL:
+                    # We are substituting this symbol, set pivot to idx
                     pivot = idx
+
+                    # # Pre-assign this symbol's frequency if we push later and
+                    # # don't assign a new symbol
+                    # symbol_freqs[idx] = self.symbols[token][0][preterm[idx]]
+
+                    # Try to get a new symbol
                     symbols = list(self.symbols[token][0].keys())
                     preterm_idx = preterm[pivot][1] + 1
                     if preterm_idx >= len(symbols):
                         # Symbol counter exceeds length of available symbols,
                         # skip this iteration to next token
                         continue
-                    preterm[pivot] = symbols[preterm_idx], preterm_idx
+
+                    # Assign new symbol and symbol frequency
+                    new_symbol = symbols[preterm_idx]
+                    preterm[pivot] = new_symbol, preterm_idx
+                    symbol_freqs[idx] = self.symbols[token][0][new_symbol]
+            new_frequency = reduce(lambda x, y: x * y, digit_freqs.values()) if len(digit_freqs) > 0 else 1
+            new_frequency *= reduce(lambda x, y: x * y, symbol_freqs.values()) if len(symbol_freqs) > 0 else 1
+            # new_frequency *= frequency
+            new_frequency *= reduce(lambda x, y: x * y, alpha_freqs.values()) if len(alpha_freqs) > 0 else 1
+
             heapq.heappush(
                 self.priority_queue,
                 QueueItem(
                     pivot=pivot,
                     grammar=grammar,
                     tokens=preterm,
-                    frequency=frequency / 2
+                    frequency=new_frequency
                 )
             )
+            digit_freqs.clear()
+            symbol_freqs.clear()
+            alpha_freqs.clear()
 
         # for item in self.priority_queue:
         #     sys.stdout.write(f"{item.pivot} => {' '.join([str(t) for t in item.tokens])}\n")
 
         return item.tokens
 
-    def pass_generator(self, wordlist: list[str]) -> Iterator[str]:
-        wordlist_map: dict[Token, set[str]] = process_wordlist(wordlist)
+    def terminal_generator(self, wordlist: list[str]) -> Iterator[str]:
+        # wordlist_map: dict[Token, set[str]] = process_wordlist(wordlist)
 
         while len(self.priority_queue) > 0:
             preterminal = self.pop_preterminal()
+            out = ''
+            for t in preterminal:
+                if isinstance(t, tuple):
+                    t = t[0]
+                out += str(t)
+            yield out
 
-            # Gather a list of how many alpha tokens are to be substituted
-            alphas: list[int] = []
-            for idx_t, t in enumerate(preterminal):
-                if (isinstance(t, Token) and t.category == Token.Category.ALPHA):
-                    alphas.append(idx_t)
+            # # Gather a list of how many alpha tokens are to be substituted
+            # alphas: list[int] = []
+            # for idx_t, t in enumerate(preterminal):
+            #     if (isinstance(t, Token) and t.category == Token.Category.ALPHA):
+            #         alphas.append(idx_t)
 
-            # Initialize them with an initial alpha value
-            preterm_copy = preterminal.copy()
-            for alpha_idx in alphas:
-                words = list(wordlist_map.get(preterm_copy[alpha_idx], []))
-                preterminal[alpha_idx] = words[0]
+            # # Initialize them with an initial alpha value
+            # preterm_copy = preterminal.copy()
+            # for alpha_idx in alphas:
+            #     words = list(wordlist_map.get(preterm_copy[alpha_idx], []))
+            #     preterminal[alpha_idx] = words[0]
 
-            # Substitute alphas for other alphas
-            for alpha_idx in alphas:
-                words = wordlist_map.get(preterm_copy[alpha_idx], [])
-                for word in words:
-                    preterminal[alpha_idx] = word
-                    out = ""
-                    for p in preterminal:
-                        if isinstance(p, tuple):
-                            p = p[0]
-                        out += str(p)
-                    yield out
+            # # Substitute alphas for other alphas
+            # for alpha_idx in alphas:
+            #     words = wordlist_map.get(preterm_copy[alpha_idx], [])
+            #     for word in words:
+            #         preterminal[alpha_idx] = word
+            #         out = ""
+            #         for p in preterminal:
+            #             if isinstance(p, tuple):
+            #                 p = p[0]
+            #             out += str(p)
+            #         yield out
 
     def train_with(self, lines: list[str]) -> None:
         """
@@ -191,6 +247,7 @@ class PCFG:
         """
         self.digits: dict[Token, tuple[dict[str, float], float]] = {}
         self.symbols: dict[Token, tuple[dict[str, float], float]] = {}
+        self.alphas: dict[Token, tuple[dict[str, float], float]] = {}
         for line in lines:
             tokens = list(Token.tokenize(line))
             for token, content in tokens:
@@ -213,13 +270,22 @@ class PCFG:
                         else:
                             value[content] += 1.0
                         self.symbols[token] = value, self.symbols[token][1] + 1.0
+                    case Token.Category.ALPHA:
+                        if token not in self.alphas:
+                            self.alphas[token] = ({}, 1.0)
+                        value = self.alphas[token][0]
+                        if content not in value:
+                            value[content] = 1.0
+                        else:
+                            value[content] += 1.0
+                        self.alphas[token] = value, self.alphas[token][1] + 1.0
             grammar = Grammar([token[0] for token in tokens])
             self.grammars[grammar] = self.grammars.get(grammar, 0.0) + 1.0
         total = sum(self.grammars.values())
         for key in self.grammars.keys():
             self.grammars[key] /= total
 
-        # assert_eq_1f(sum(self.grammars.values()))
+        assert_eq_1f(sum(self.grammars.values()))
 
         total = sum(value[1] for value in self.digits.values())
         for key in self.digits.keys():
@@ -234,7 +300,7 @@ class PCFG:
 
             self.digits[key] = digits, frequency / total
 
-        # assert_eq_1f(sum(value[1] for value in self.digits.values()))
+        assert_eq_1f(sum(value[1] for value in self.digits.values()))
 
         total = sum(value[1] for value in self.symbols.values())
         for key in self.symbols.keys():
@@ -246,7 +312,19 @@ class PCFG:
                 symbols[symbol] /= total_symbols
 
             self.symbols[key] = symbols, frequency / total
-        # assert_eq_1f(sum(value[1] for value in self.symbols.values()))
+        assert_eq_1f(sum(value[1] for value in self.symbols.values()))
+
+        total = sum(value[1] for value in self.alphas.values())
+        for key in self.alphas.keys():
+            alphas = self.alphas[key][0]
+            frequency = self.alphas[key][1]
+
+            total_alphas = sum(alphas.values())
+            for alpha in alphas.keys():
+                alphas[alpha] /= total_alphas
+
+            self.alphas[key] = alphas, frequency / total
+        assert_eq_1f(sum(value[1] for value in self.alphas.values()))
 
         # Build a priority queue using initial preterminal values
         for grammar, frequency in self.grammars.items():
@@ -260,7 +338,8 @@ class PCFG:
                         terminal = list(self.symbols[token][0].keys())[-1]
                         preterminal.append((terminal, 0))
                     case Token.Category.ALPHA:
-                        preterminal.append(token)
+                        terminal = list(self.alphas[token][0].keys())[-1]
+                        preterminal.append((terminal, 0))
             heapq.heappush(
                 self.priority_queue,
                 QueueItem(
@@ -315,7 +394,7 @@ if __name__ == '__main__':
     out_file = ''
     train_file = ''
     words_file = ''
-    password_range = 6, 12
+    password_range: tuple[int, int] | None = None
 
     args = sys.argv[1:]
     if len(args) == 0:
@@ -351,9 +430,13 @@ if __name__ == '__main__':
             print('Provide a training file with `-t`')
             exit(1)
 
-        with open(train_file, 'r', encoding='utf8') as f:
-            lines = [line.removesuffix('\n') for line in f.readlines() if len(line) in range(*password_range)]
-            pcfg.train_with(lines)
+        with open(train_file, 'r', encoding='ISO8859-1') as f: # Change between utf-8 or ISO8859-1 as necessary
+            if password_range is not None:
+                lines = [line.removesuffix('\n') for line in f.readlines() if len(line) in range(*password_range)]
+                pcfg.train_with(lines)
+            else:
+                lines = [line.removesuffix('\n') for line in f.readlines()]
+                pcfg.train_with(lines)
 
         with open(serialize_to, 'wb') as dest_file:
             pickle.dump(pcfg, dest_file)
@@ -372,7 +455,7 @@ if __name__ == '__main__':
         wordlist = list(set(f.readlines()))
 
     with open(out_file, 'w') as f:
-        for i, password in enumerate(pcfg.pass_generator(wordlist)):
+        for i, password in enumerate(pcfg.terminal_generator(wordlist)):
             if i > limit:
                 break
             print_inline(f"Generated password: {password}, {len(pcfg.priority_queue)} terminals in queue")
