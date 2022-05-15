@@ -1,3 +1,4 @@
+% vim: tw=80 fo=aw2tq:
 \documentclass{VUMIFInfBakalaurinis}
 \usepackage{algorithmicx}
 \usepackage{algorithm}
@@ -9,30 +10,35 @@
 \usepackage{color}
 \usepackage{float}
 \usepackage{graphicx}
+
+\usepackage{pgfplots}
+\usepackage{pgfplotstable}
+\pgfplotsset{compat=1.7}
+\usepackage{tikz}
+
 % \usepackage{hyperref}  % Nuorodų aktyvavimas
 \usepackage{listings}
 \usepackage{subfig}
 \usepackage{url}
 \usepackage{wrapfig}
 
-
 % Titulinio aprašas
 \university{Vilniaus universitetas}
 \faculty{Matematikos ir informatikos fakultetas}
-\institute{Informatikos institutas}  % Užkomentavus šią eilutę - institutas neįtraukiamas į titulinį
+\institute{Informatikos institutas}
 \department{Informatikos katedra}
 \papertype{Baigiamasis bakalauro darbas}
-\title{Rizikų valdymo proceso modeliavimas}
-\titleineng{Modeling of Risk Management Process}
-\status{X kurso Y grupės studentas}
-\author{Vardenis Pavardenis}
+\title{Naujausių automatizuoto slaptažodžių parinkimo metodų palyginimas}
+\titleineng{Comparison of the latest automated password guessing techniques}
+\status{4 kurso 1 grupės studentas}
+\author{Gediminas Valys}
 % \secondauthor{Vardonis Pavardonis}   % Pridėti antrą autorių
-\supervisor{prof. habil. dr. Vardaitis Pavardaitis}
+\supervisor{prof. dr. Igoris Belovas}
 \reviewer{doc. dr. Vardauskas Pavardauskas}
-\date{Vilnius \\ \the\year}
+% \date{Vilnius \\ \the\year}
+\date{Vilnius \\ 2022}
 
-% Nustatymai
-% \setmainfont{Palemonas}   % Pakeisti teksto šriftą į Palemonas (turi būti įdiegtas sistemoje)
+\setmainfont{Palemonas}
 \bibliography{bibliografija} 
 
 \begin{document}
@@ -45,8 +51,136 @@ Sutartinių ženklų, simbolių, vienetų ir terminų sutrumpinimų sąrašas (j
 ženklų, simbolių, vienetų ir terminų bendras skaičius didesnis nei 10 ir
 kiekvienas iš jų tekste kartojasi daugiau nei 3 kartus).
 
-\sectionnonum{Įvadas}
-Įvade apibūdinamas darbo tikslas, temos aktualumas ir siekiami rezultatai.
+\section{Santrauka}
+Santrauka lietuviškai.
+
+\section{Įvadas}
+% Kokie darbo tikslai
+% Kas buvo sukurta, kokios problemos išspręstos, kokie tyrimai vykdyti
+% Kokie rezultatai pasiekti
+% Likusių dalių struktūra
+Vartotojo autentifikacija slaptažodžiu yra vienas iš pagrindinių kibernetinio 
+saugumo metodų. Kai yra poreikis nustatyti vartotojo slaptažodį (pvz. 
+kriminalistiniuose, ekspertiniuose tyrimuose, siekiant nustatyti kaltę), 
+dabartiniai populiariausi metodai su palyginti mažais kompiuteriniais resursais 
+gali nustatyti slaptažodį iki 6 simbolių ilgio, \textquote{ASCII} (angl. 
+\textquote{American Standard Code for Information Interchange}) koduotėje, 
+tačiau ilgesniams slaptažodžiams kompiuterinių išteklių ir laiko reikalavimai 
+žymiai padidėja ir darbas netenka prasmės. Naujausi slaptažodžių parinkimo 
+metodai, pagrįsti tikimybine, bekontekstine gramatika (angl. 
+\textquote{Probabilistic context-free grammar}) ir mašininio mokymosi metodais 
+gali identifikuoti slaptažodžių struktūras bei ypatybes, ir parinkti ilgesnius 
+nei 6 simbolių slaptažodžius su palyginti mažais kompiuteriniais resursais. 
+Šiame darbe siekiama palyginti du tokius automatizuotus slaptažodžio parinkimo 
+metodus ir įvertinti jų parenkamus slaptažodžius atliekant eksperimentų seriją 
+su nutekintomis slaptažodžių duomenų bazėmis.
+
+\section{Literatūros apžvalga}
+% Ne tik pasakyti ką atliko kiti autoriai, bet palyginti jų darbus, pateikti tų 
+% darbų pliusus ir minusus. Nuo literatūros analizės turi priklausyti ir 
+% pagrindinėje dalyje pasirinkti metodai
+\subsection{\textquote{PCFG} Algoritmas}
+\textquote{PCFG} (angl. \textquote{Probabilistic Context Free Grammar}) - 
+tikimybinis gramatikos taisyklių rinkinys, nurodantis, kaip kažkurį tai 
+simbolį-reikšmę galima transformuoti į kitą simbolį. Pagrindinis algoritmo 
+tikslas yra identifikuoti žmonių slaptažodžių kūrimo įpročius, ir, remiantis jų 
+įpročių, slaptažodžių požymiais ir ypatybėmis, parinkti naujus slaptažodžius.
+
+Slaptažodžių parinkimo strategijoje, \textquote{PCFG} algoritmas peržiūri 
+slaptažodžių aibę, kad nustatytų, kokias dažnai pasikartojančias, labiausiai 
+tikėtinas transformacijas galėtų atlikti su slaptažodžiais, ir parenka naujus 
+slaptažodžius su tomis transformacijomis.
+
+Kiekvienam slaptažodžiui iš apmokymo duomenų rinkinio algoritmas pirmiausia 
+išveda gramatiką, t.y. simbolių grupės yra sugrupuojamos pagal tipą: skaičiai, 
+raidės, specialūs simboliai, ir užfiksuojamas konkrečių simbolių sekų bei pačios 
+gramatikos pasikartojimų skaičius. Kai visi slaptažodžiai yra apdoroti į jų 
+atitinkamas gramatikas, paskaičiuojami gramatikų ir simbolių grupių 
+pasikartojimo dažniai. Minėti dažniai yra naudojami parenkant naujus 
+slaptažodžius - pirmiausia parenkami slaptažodžiai, kurių gramatika ir 
+gramatikoje esančių simbolių grupių dažniai yra didžiausi, tokiu būdu labiausiai 
+slaptažodžiai su aukščiausia tikimybe yra parenkami pirmi. Taip pat garantuojama 
+algoritmo pabaiga - arba pasibaigia gramatikos, arba pasibaigia unikalios 
+simbolių grupės - ir nauji slaptažodžiai nebeparenkami. Parenkamų slaptažodžių 
+bei gramatikų ir simbolių grupių kiekiai priklauso nuo apmokymo duomenų rinkinio 
+dydžio - yra svarbūs pasikartojantys duomenys, kurie naudojami tikimybių 
+skaičiavimams.
+
+Viena gramatika \textquote{PCFG} algoritme gali būti panaudota kelis kartus 
+parenkant slaptažodžius. \textquote{PCFG} algoritme yra išskiriami du tipai 
+slaptažodžių - preliminarūs (angl. \textquote{Pre-terminal}) ir galutiniai 
+(angl. \textquote{Terminal}). Kiekvienas preliminarus slaptažodis yra parenkamas 
+atsižvelgiant į jo ašies reikšmę, t.y. simbolių grupės, kuri buvo 
+pakeista/transformuota parenkant šį slaptažodį, indeksas (pirminė ašies reikšmė 
+parenkant pirmuosius preliminarius slaptažodžius yra lygi nuliui). Galutinių 
+slaptažodžių parinkimo ir preliminarių slaptažodžių transformavimo taisyklės yra 
+tokios:
+\begin{enumerate}
+  \item preliminariame slaptažodyje simbolių grupė gali būti keičiama tik jei 
+    preliminaraus slaptažodžio ašies vertė yra mažesnė už grupės indeksą 
+    slaptažodžio gramatikoje;
+  \item preliminaraus slaptažodžio nauja ašis yra slaptažodyje pakeistos 
+    simbolių grupės indeksas, skaičiuojant nuo 0;
+  \item iš preliminaraus slaptažodžio yra parenkamas galutinis slaptažodis kai 
+    yra pakeičiama viena ir tik viena simbolių grupė.
+\end{enumerate}
+
+Vaduvaujantis aukščiau minėtomis taisyklėmis yra parenkami nauji galutiniai ir 
+preliminarūs slaptažodžiai su transformuotomis simbolių grupėmis. Galutinis 
+slaptažodis gali būti taikomas vartotojo kokio nors slaptažodžio atkūrimui iš 
+maišos funkcijos išvestos kontrolinės sumos (pvz. MD5, SHA-1 ar kitos maišos 
+funkcijos). Nauji preliminarūs slaptažodžiai yra grąžinami algoritmui, tolesnėms 
+transformacijoms, kol iš preliminaraus slaptažodžio gramatikos bei atitinkamų 
+simbolių grupių galima sujungti/transformuoti naujas reikšmes.
+
+\subsection{\textquote{PassGAN} Algoritmas}
+\subsubsection{Apie generatyvinius konkurencinius tinklus}
+Generatiniai konkurenciniai tinklai (angl. \textquote{Generative Adversarial 
+Networks}, \textquote{GAN}) yra generatyvinis modeliavimas naudojant gilaus 
+mašininio mokimosi metodus. Generatyvinis modeliavimas yra mašininio mokymosi 
+metodas be mokytojo, kuriame modelis yra apmokamas generuoti tokias reikšmes, 
+kurios galėtų tikėtinai būti iš apmokymo duomenų rinkinio. Generatyviniame 
+konkurenciniame tinkle yra dvi dalys - generavimo modelis (angl. 
+\textquote{Generator model}), kuris yra apmokamas generuoti naujas reikšmes, ir 
+diskriminatoriaus modelis (angl. \textquote{Discriminator model}), kuris 
+klasifikuoja generuojamas reikšmes kaip tikras arba netikras. Generativinių 
+konkurencinių tinklų pagrindas yra teoriškas žaidybinis scenarijus, kuriame 
+minėti du modeliai konkuruoja ir varžosi - vienas modelis generuoja reikšmes, 
+kitas bando atskirti jas nuo generatoriaus ir apmokymo duomenų 
+\cite{Goodfellow-et-al-2016}. Generavimo modelis yra apmokamas tol, kol 
+generuoja tokias įtikinamas reikšmes, kurias diskriminatoriaus modelis negali 
+atskirti nuo realių (apmokymo) reikšmių.
+
+Pagrindinis skirtumas tarp diskriminuojančio ir generatyvinio modeliavimo yra 
+tai, diskriminacinis modelis klasifikuoja - turi būti priimtas sprendimas, 
+kuriai klasei priklauso tam tikra reikšmė, o generatyvinis - generuoja arba 
+sukuria naujas reikšmes pagal pradinius duomenis, kurie galėtų tikėtinai būti 
+pradiniame duomenų rinkinyje. Kitaip tariant, generatyvinis modelis gali būti 
+apmokytas pradinių duomenų pasiskirstymo ir gali generuoti naujas reikšmes, 
+kurios galėtų tikėtinai būti priskirtos prie pradinių duomenų \cite{Bishop07}.
+
+Generavimo modeliui yra pateikiama kaip įvestis nustatyto ilgio vektorius iš 
+atsitiktinai paskirstytos duomenų aibės (angl. \textquote{Gaussian 
+distribution}). Apmokymo metu tam tikriems (paprastai nematomiems) požymiams iš 
+šios duomenų aibės yra priskiriama svarba, t.y. generuojamos reikšmės artėja 
+prie apmokymo duomenų aibės - generatorius sugeneruoja grupę reikšmių, kurios, 
+kartu su apmokymo duomenimis, yra perduodami diskriminatoriui klasifikuoti kaip 
+tikros arba netikros. Tokiu būdu diskriminatoriaus parametrai yra tobulinami 
+tiksliau klasifikuoti tikras/netikras reikšmes, o generatorius - kiek 
+sugeneruotos reikšmės galėjo apgauti/įtikinti diskriminatorių (diskriminatoriaus 
+reikšmės, nustatytos kaip tikros arba netikros, atskleidžia reikalingą 
+informaciją apie apmokymo duomenų aibę generatoriui, kuris gali ją naudoti 
+tiksliau modeliuoti apmokymo duomenų pasiskirstymą). Po modelio apmokymo, minėta 
+duomenų aibė turėtų atitikti apmokymo duomenų aibę, t.y. diskriminatorius negali 
+su didesniu nei apie 50 \% tikslumu (pasitikėjimu, arba angl. 
+\textquote{Confidence}) atskirti apmokymo duomenų aibės reikšmes nuo generuojamų 
+reikšmių.
+\subsubsection{\textquote{PassGAN} metodo požymiai}
+\textquote{PassGAN} metodui, kuriame generatyvinis konkurencinis tinklas yra 
+pritaikytas slaptažodžių generavimui, yra reikalingi palyginti 
+
+
+\cite{DBLP:journals/corr/abs-1709-00440}
 
 \section{Pagrindinė tiriamoji dalis}
 Pagrindinėje tiriamojoje dalyje aptariama ir pagrindžiama tyrimo metodika;
@@ -54,17 +188,123 @@ pagal atitinkamas darbo dalis, nuosekliai, panaudojant lyginamosios analizės,
 klasifikacijos, sisteminimo metodus bei apibendrinimus, dėstoma sukaupta ir
 išanalizuota medžiaga. 
 
-\subsection{Poskyris}
-Citavimo pavyzdžiai: cituojamas vienas šaltinis \cite{PvzStraipsnLt}; cituojami
-keli šaltiniai \cite{PvzStraipsnEn, PvzKonfLt, PvzKonfEn, PvzKnygLt, PvzKnygEn,
-PvzElPubLt, PvzElPubEn, PvzMagistrLt, PvzPhdEn}.
+\subsection{Etika}
+Šis darbas buvo atliktas pagal Europos elgesio kodeksą mokslinių tyrimų etikos 
+klausimais
+(angl. \textquote{European Code of Conduct for Research Integrity}), paruoštą 
+\textquote{European Federation of Academies of Sciences and Humanities} (ALLEA) 
+organizacijos. Kadangi nutekintos duomenų bazės yra sudarytos iš galimų 
+vartotojų asmeninės informacijos (pvz. vardas, pavardė, elektroninis pašto 
+adresas), visa informacija buvo saugiai laikoma ir tvarkoma. Asmens duomenų 
+atskleidimo galimybės buvo mažinamos įgyvendinant griežtas saugumo priemones, ir 
+nutekinti slaptažodžiai nebuvo testuojami su tikromis internetinių paslaugų 
+vartotojų paskyromis. Darbe atskleidžiami tik patys dažniausi slaptažodžiai, jų 
+sudėtingumas ir struktūra. Slaptažodžiai, kurie galėtų būti naudojami 
+identifikuoti vartotojus, nebuvo atskleisti. Vartotojų asmeninė informacija yra 
+nepateikta.
 
-\subsubsection{Skirsnis}
-\subsubsubsection{Straipsnis}
-\subsubsection{Skirsnis}
-\section{Skyrius}
-\subsection{Poskyris}
-\subsection{Poskyris}
+\subsection{Nutekintų slaptažodžių duomenų bazių analizė}
+Šiame darbe naudojamos trys nutekintų slaptažodžių duomenų bazės - A, B ir C. 
+Duomenų bazę (rinkinį) C sudaro slaptažodžių SHA-1 maišos funkcijos kontrolinės 
+sumos. Dešimt dažniausiai pasikartojančių slaptažodžių duomenų bazėje A yra 
+pateikti \ref{10-dazn-slapt-a} lentelėje, o duomenų bazėje B - 
+\ref{10-dazn-slapt-b} lentelėje.
+
+% $ sort DB.txt | uniq -c | sort -nr | head -n 10
+\begin{table}[hb]
+\centering
+\begin{tabular}{|c|c|}
+  \hline
+  Kiekis & Slaptažodis \\
+  \hline
+  661 & 123456 \\
+  363 & aaaaaa \\
+  313 & 123456789 \\
+  187 & qwerty \\
+  125 & vasara \\
+  122 & pavasaris \\
+  122 & kaktusas \\
+  119 & slaptazodis \\
+  116 & katinas \\
+  107 & 12345678 \\
+  \hline
+\end{tabular}
+\caption{Duomenų rinkinio A 10 dažniausiai pasikartojančių slaptažodžių}
+\label{10-dazn-slapt-a}
+\end{table}
+
+\ref{10-dazn-slapt-a} lentelėje pateikti slaptažodžiai daugiausia sudaryti iš 
+bendrinių daiktavardžių, paprastų skaičių ir raidžių sekų.
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{|c|c|}
+  \hline
+  Kiekis & Slaptažodis \\
+  \hline
+  2252 & x4ivygA51F \\
+  1341 & 123456789 \\
+  1302 & h54rsjrF5J46788998 \\
+  993 & 64t3zaWonZ \\
+  917 & 2u8Qujf5eE \\
+  896 & slaptazodis \\
+  893 & 88ggOx8ouG \\
+  828 & lopas123 \\
+  823 & 5ogs6d4QnbA \\
+  761 & Y52flzfq8V \\
+  \hline
+\end{tabular}
+\caption{Duomenų rinkinio B 10 dažniausiai pasikartojančių slaptažodžių}
+\label{10-dazn-slapt-b}
+\end{table}
+
+Kaip yra pavaizduota \ref{10-dazn-slapt-b} lentelėje, kitaip nei 
+\ref{10-dazn-slapt-a} lentelėje, dauguma slaptažodžių yra sudėtingesni skaičių 
+ir simbolių sekų mišiniai, kuriuose bendriniai daiktavardžiai yra retesni.
+
+% https://shantoroy.com/latex/line-graph-pgfplots/
+\begin{tikzpicture}
+\begin{axis}[
+  xlabel=Sugeneruotų slaptažodžių kiekis, vnt.,
+  ylabel=Sutampančių slaptažodžių kiekis, vnt.,
+  width=10cm,height=7cm,
+  legend style={at={(0.0,.91)},anchor=west}
+]
+
+% Add values and attributes for the first plot
+\addplot[color=red,mark=*] coordinates {
+  (10^6, 6)
+  (10^7, 7)
+  (10^8, 8)
+  (10^9, 9)
+  (10^10, 10)
+};
+
+% Add values and attributes for the second plot
+\addplot[color=blue,mark=*] coordinates {
+  (10^6, 8)
+  (10^7, 9)
+  (10^8, 10)
+  (10^9, 11)
+  (10^10, 12)
+};
+
+\legend{Case 1,Case 2}
+\end{axis}
+\end{tikzpicture}
+
+
+\subsection{Eksperimentuose taikoma strategija}
+Su pasirinktu automatizuoto slaptažodžių parinkimo metodu, apmokyti modelį su 80 
+\% duomenų iš duomenų rinkinių A ir B, bei sumaišyto A ir B duomenų rinkinio. 
+Apmokytu modeliu sugeneruoti tarp $10^{6}$ ir $10^{10}$ slaptažodžių, ir, 
+naudojantis specialia programine įranga \textquote{Hashcat}, nustatyti, kiek 
+slaptažodžių iš sugeneruotų slaptažodžių aibės sutampa su duomenų rinkinyje C 
+slaptažodžiais.
+
+\subsection{\textquote{PCFG} eksperimentų serija}
+
+\subsection{\textquote{PassGAN} eksperimentų serija}
 
 \sectionnonum{Išvados}
 Išvadose ir pasiūlymuose, nekartojant atskirų dalių apibendrinimų,
@@ -74,12 +314,7 @@ suformuluojamos svarbiausios darbo išvados, rekomendacijos bei pasiūlymai.
 Šiame skyriuje pateikiamos išvados (reziume) anglų kalba.
 
 
-\printbibliography[heading=bibintoc] % Literatūros šaltiniai aprašomi
-% bibliografija.bib faile. Šaltinių sąraše nurodoma panaudota literatūra,
-% kitokie šaltiniai. Abėcėlės tvarka išdėstoma tik darbe panaudotų (cituotų,
-% perfrazuotų ar bent paminėtų) mokslo leidinių, kitokių publikacijų
-% bibliografiniai aprašai (šiuo punktu pasirūpina LaTeX). Aprašai pateikiami
-% netransliteruoti.
+\printbibliography[heading=bibintoc]
 
 \appendix  % Priedai
 % Prieduose gali būti pateikiama pagalbinė, ypač darbo autoriaus savarankiškai
@@ -87,28 +322,14 @@ suformuluojamos svarbiausios darbo išvados, rekomendacijos bei pasiūlymai.
 % diskelyje ar kompaktiniame diske. Priedai taip pat vadinami ir numeruojami.
 % Tekstas su priedais siejamas nuorodomis (pvz.: \ref{img:mlp}).
 
-\section{Niauroninio tinklo struktūra}
-\begin{figure}[H]
-    \centering
-    \includegraphics[scale=0.5]{img/MLP}
-    \caption{Paveikslėlio pavyzdys}
-    \label{img:mlp}
-\end{figure}
-
+% \section{Niauroninio tinklo struktūra}
+% \begin{figure}[H]
+%     \centering
+%     \includegraphics[scale=0.5]{img/MLP}
+%     \caption{Paveikslėlio pavyzdys}
+%     \label{img:mlp}
+% \end{figure}
 
 \section{Eksperimentinio palyginimo rezultatai}
-% tablesgenerator.com - converts calculators (e.g. excel) tables to LaTeX
-\begin{table}[H]\footnotesize
-  \centering
-  \caption{Lentelės pavyzdys}
-  {\begin{tabular}{|l|c|c|} \hline
-    Algoritmas & $\bar{x}$ & $\sigma^{2}$ \\
-    \hline
-    Algoritmas A  & 1.6335    & 0.5584       \\
-    Algoritmas B  & 1.7395    & 0.5647       \\
-    \hline
-  \end{tabular}}
-  \label{tab:table example}
-\end{table}
 
 \end{document}
