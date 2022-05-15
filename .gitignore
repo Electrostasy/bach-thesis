@@ -1,2 +1,16 @@
+# Python
 *.pickle
 __pycache__
+
+# Tex
+*~
+*.log
+*.tmp
+*.swp
+*.bak
+*.toc
+*.run.xml
+*.blg
+*.bcf
+*.bbl
+*.aux
