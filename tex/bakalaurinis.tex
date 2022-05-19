@@ -1,7 +1,7 @@
-% vim: tw=80 fo=aw2tq:
+% vim: tw=80 fo=aw2tq ts=2 shiftwidth=2 et:
 \documentclass{VUMIFInfBakalaurinis}
-\usepackage{algorithmicx}
 \usepackage{algorithm}
+\usepackage{algorithmicx}
 \usepackage{algpseudocode}
 \usepackage{amsfonts}
 \usepackage{amsmath}
@@ -10,19 +10,23 @@
 \usepackage{color}
 \usepackage{float}
 \usepackage{graphicx}
-
-\usepackage{pgfplots}
-\usepackage{pgfplotstable}
-\pgfplotsset{compat=1.7}
-\usepackage{tikz}
-
-% \usepackage{hyperref}  % Nuorodų aktyvavimas
-\usepackage{listings}
 \usepackage{subfig}
 \usepackage{url}
 \usepackage{wrapfig}
 
-% Titulinio aprašas
+% Plotting
+\usepackage{siunitx}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=newest}
+\usepgfplotslibrary{units}
+\sisetup{round-mode=places, round-precision=2 }
+
+% Code blocks
+\usepackage{listings}
+\lstset{breaklines=true}
+
+% Title page
 \university{Vilniaus universitetas}
 \faculty{Matematikos ir informatikos fakultetas}
 \institute{Informatikos institutas}
@@ -32,10 +36,8 @@
 \titleineng{Comparison of the latest automated password guessing techniques}
 \status{4 kurso 1 grupės studentas}
 \author{Gediminas Valys}
-% \secondauthor{Vardonis Pavardonis}   % Pridėti antrą autorių
 \supervisor{prof. dr. Igoris Belovas}
 \reviewer{doc. dr. Vardauskas Pavardauskas}
-% \date{Vilnius \\ \the\year}
 \date{Vilnius \\ 2022}
 
 \setmainfont{Palemonas}
@@ -50,100 +52,273 @@
 Sutartinių ženklų, simbolių, vienetų ir terminų sutrumpinimų sąrašas (jeigu
 ženklų, simbolių, vienetų ir terminų bendras skaičius didesnis nei 10 ir
 kiekvienas iš jų tekste kartojasi daugiau nei 3 kartus).
+% Sudeti daznai naudotas savokas cia kad nesikartotu tekste
 
 \section{Santrauka}
 Santrauka lietuviškai.
 
+\section{Summary}
+Summary in English.
+
 \section{Įvadas}
-% Kokie darbo tikslai
-% Kas buvo sukurta, kokios problemos išspręstos, kokie tyrimai vykdyti
-% Kokie rezultatai pasiekti
-% Likusių dalių struktūra
-Vartotojo autentifikacija slaptažodžiu yra vienas iš pagrindinių kibernetinio 
-saugumo metodų. Kai yra poreikis nustatyti vartotojo slaptažodį (pvz. 
-kriminalistiniuose, ekspertiniuose tyrimuose, siekiant nustatyti kaltę), 
-dabartiniai populiariausi metodai su palyginti mažais kompiuteriniais resursais 
-gali nustatyti slaptažodį iki 6 simbolių ilgio, \textquote{ASCII} (angl. 
-\textquote{American Standard Code for Information Interchange}) koduotėje, 
-tačiau ilgesniams slaptažodžiams kompiuterinių išteklių ir laiko reikalavimai 
-žymiai padidėja ir darbas netenka prasmės. Naujausi slaptažodžių parinkimo 
-metodai, pagrįsti tikimybine, bekontekstine gramatika (angl. 
-\textquote{Probabilistic context-free grammar}) ir mašininio mokymosi metodais 
-gali identifikuoti slaptažodžių struktūras bei ypatybes, ir parinkti ilgesnius 
-nei 6 simbolių slaptažodžius su palyginti mažais kompiuteriniais resursais. 
-Šiame darbe siekiama palyginti du tokius automatizuotus slaptažodžio parinkimo 
-metodus ir įvertinti jų parenkamus slaptažodžius atliekant eksperimentų seriją 
-su nutekintomis slaptažodžių duomenų bazėmis.
+% Autentifikacija slaptažodžiu
+Vartotojo autentikacija slaptažodžiu yra vienas iš pagrindinių kibernetinio 
+saugumo metodų.
+% Kodėl yra poreikis slaptažodį nustatyti
+Baudžiamųjų bylų tyrimuose, siekiant nustatyti kaltę, skaitmeninės informacijos 
+specialistams pavedama užduotis nuskaityti kaltinamojo kompiuterių, mobiliųjų 
+įrenginių informaciją ir atlikti informacijos analizę, atsakyti į užduotyje 
+pateiktus klausimus - jei įrenginys apsaugotas skaitmeninės informacijos 
+šifravimo priemonėmis (angl. \textquote{Full Disk Encryption}), taip pat svarbu 
+nustatyti prisijungimo/apsaugos/iššifravimo slaptažodį - kitaip informacijos 
+analizės atlikti nėra galimybės.
+% Plačiau apie probleminę sritį
+Tokiose atvejuose, kai reika iššifruoti skaitmeninę informacijos laikmeną arba 
+prisijungti prie vartotojo internetinės paskyros nežinant apsaugos slaptažodį, 
+pasitelkiama dabar naudojamais slaptažodžio parinkimo metodais: atspėjimas 
+brutalios jėgos būdu, naudojant įvairias nutekintas slaptažodžių duomenų bazes. 
+Aukščiau minėti metodai yra ribotų galimybių - brutalios jėgos būdu ilgesnius 
+nei 6 simbolių ilgio slaptažodžius nustatyti praktiškai neįmanoma dėl 
+eksponentiškai išaugusio sudėtingumo, o slaptažodžių sąrašuose tikimybė, kad yra 
+ieškomas slaptažodis, maža.
+% Tikslas - palyginti du naujausius automatizuoto slaptažodžio parinkimo 
+% metodus, kurie gali ir sudėtingesnius slaptažodžius lengvai parinkti
+Naujausi automatizuoto slaptažodžių parinkimo metodai, pagrįsti mašininiu 
+mokymusi metodais ir galintys identifikuoti slaptažodžių struktūrą, žmogaus 
+akimi nematomas slaptažodžių ypatybes, turi potencialo parinkti ir unikalius, 
+ilgesnius, nei 6 simbolių ilgio, slaptažodžius, kurių slaptažodžių sąrašuose 
+nėra. Šio darbo tikslas yra palyginti tokius metodus - įvertinant jų efektyvumą, 
+privalumus ir trūkumus.
+% Kaip aš tai atliksiu - įvardinti uždavinius, tyrimo metodologija
+Iškelto tikslo pasiekimui šiame darbe bus atliekami eksperimentai su aukščiau 
+minėtais slaptažodžių parinkimo metodais, kuriose siekiama parinkti kuo didesnį 
+kiekį iš anksto nežinomų slaptažodžių nutekintuose slaptažodžių duomenų bazėse. 
+Apmokius slaptažodžių parinkimo modelį su pasirinktomis atvirai prieinamomis 
+nutekintomis slaptažodžių duomenų bazėmis, bus fiksuojamas parinktų 
+slaptažodžių, persidengiančių su nežinomų slaptažodžių aibe, kiekis. Išbandžius 
+skirtingus modelio apmokymo slaptažodžių duomenų bazes, užfiksavus ir įvertinus 
+pasiektus rezultatus, vedamos išvados.
 
 \section{Literatūros apžvalga}
-% Ne tik pasakyti ką atliko kiti autoriai, bet palyginti jų darbus, pateikti tų 
-% darbų pliusus ir minusus. Nuo literatūros analizės turi priklausyti ir 
-% pagrindinėje dalyje pasirinkti metodai
-\subsection{\textquote{PCFG} Algoritmas}
-\textquote{PCFG} (angl. \textquote{Probabilistic Context Free Grammar}) - 
-tikimybinis gramatikos taisyklių rinkinys, nurodantis, kaip kažkurį tai 
-simbolį-reikšmę galima transformuoti į kitą simbolį. Pagrindinis algoritmo 
-tikslas yra identifikuoti žmonių slaptažodžių kūrimo įpročius, ir, remiantis jų 
-įpročių, slaptažodžių požymiais ir ypatybėmis, parinkti naujus slaptažodžius.
+\subsection{Bendros sąvokos}
+Šioje dalyje siekiama apibūdinti bei įsigilinti į vėlesniuose skyriuose 
+nagrinėjamas temas ir idėjas, kuriomis yra paremti slaptažodžių parinkimo 
+metodai, pasirinkti sprendimai.
 
-Slaptažodžių parinkimo strategijoje, \textquote{PCFG} algoritmas peržiūri 
-slaptažodžių aibę, kad nustatytų, kokias dažnai pasikartojančias, labiausiai 
-tikėtinas transformacijas galėtų atlikti su slaptažodžiais, ir parenka naujus 
-slaptažodžius su tomis transformacijomis.
+\subsubsubsection{Maišos funkcija ir kontrolinė suma} \label{sec:hashing}
+Slaptažodžių parinkimui bei saugojimui yra pasitelkiama kriptografinėmis maišos 
+funkcijomis (angl. \textquote{Hash Function}) ir jų savybėmis - kriptografijoje 
+naudojamas skaičiavimas, kuris iš tam tikros įvesties grąžina unikalę vertę, 
+vadinama kontroline suma (angl. \textquote{Hash}), kuri dalinai arba pilnai 
+pasikeičia atspindint menkiausią pasikeitimą įvesties duomenyse. Pavyzdžiui, 
+maišos funkcija \textquote{MD5} (angl. \textquote{Message Digest Algorithm 5}) 
+įvestiems duomenims \textquote{duomenys} grąžina išvestį 
+\textquote{df4111da0615399abad70223d1d74b9b}; pakeitus įvesties duomenų vieną 
+simbolį - įvesties duomenys yra \textquote{duomenis} - atitinkama 
+\textquote{MD5} maišos funkcijos kontrolinė suma bus 
+\textquote{a9d5bc509e33c1d98dca1ba876c9045b}.
 
-Kiekvienam slaptažodžiui iš apmokymo duomenų rinkinio algoritmas pirmiausia 
-išveda gramatiką, t.y. simbolių grupės yra sugrupuojamos pagal tipą: skaičiai, 
-raidės, specialūs simboliai, ir užfiksuojamas konkrečių simbolių sekų bei pačios 
-gramatikos pasikartojimų skaičius. Kai visi slaptažodžiai yra apdoroti į jų 
-atitinkamas gramatikas, paskaičiuojami gramatikų ir simbolių grupių 
-pasikartojimo dažniai. Minėti dažniai yra naudojami parenkant naujus 
-slaptažodžius - pirmiausia parenkami slaptažodžiai, kurių gramatika ir 
-gramatikoje esančių simbolių grupių dažniai yra didžiausi, tokiu būdu labiausiai 
-slaptažodžiai su aukščiausia tikimybe yra parenkami pirmi. Taip pat garantuojama 
-algoritmo pabaiga - arba pasibaigia gramatikos, arba pasibaigia unikalios 
-simbolių grupės - ir nauji slaptažodžiai nebeparenkami. Parenkamų slaptažodžių 
-bei gramatikų ir simbolių grupių kiekiai priklauso nuo apmokymo duomenų rinkinio 
-dydžio - yra svarbūs pasikartojantys duomenys, kurie naudojami tikimybių 
-skaičiavimams.
+Paminėtina, kad iš kontrolinės sumos įvesties duomenų atkurti paprastai 
+neįmanoma, tačiau tarp skirtingų įvesties duomenų gali būti ir kolizijų - 
+(dalinai) sutampančių kontrolinių sumų, pagal kurias galima (dalinai) atspėti 
+pradinius duomenis. Siekiant išvengti kolizijų, rekomenduojama naudoti stiprias 
+kriptografines maišos funkcijas, kurių kolizijų tikimybės yra labai mažos, 
+praktiškai neįmanomos. Kaip pavyzdį paėmus \textquote{SHA-256} kriptografinę 
+maišos funkciją (angl. \textquote{Secure Hash Algorithm 256 Bit}), kurios 
+kontrolinė suma yra 64 simbolių (32 baitų, 256 bitų) ilgio, sudaryta iš 
+skaitmenų ir lotyniškos abėcėlės raidžių, tikimybė, kad kontrolinė suma 
+nepasikeistų net su mažiausiu pasikeitimu pradiniuose duomenyse (pvz. pakeitus 
+vieną bitą) yra $\frac{1}{2^{256}}$ - beveik lygi nuliui. Palyginus su anksčiau 
+minėtu \textquote{MD5} kriptografinės maišos funkcijos algoritmu, kurio 
+kontrolinės sumos yra 32 simbolių (16 baitų, 128 bitų) ilgio, tikimybė, kad bus 
+vienoda kontrolinė suma - $\frac{1}{2^{128}}$. Praktikoje jau buvo rastos 
+kolizijos su \textquote{MD5} algoritmu.
+% TODO: čia būtų gerai įdėti nuorodą arba šaltinį, kaip ir kada buvo rastos
 
-Viena gramatika \textquote{PCFG} algoritme gali būti panaudota kelis kartus 
-parenkant slaptažodžius. \textquote{PCFG} algoritme yra išskiriami du tipai 
-slaptažodžių - preliminarūs (angl. \textquote{Pre-terminal}) ir galutiniai 
-(angl. \textquote{Terminal}). Kiekvienas preliminarus slaptažodis yra parenkamas 
-atsižvelgiant į jo ašies reikšmę, t.y. simbolių grupės, kuri buvo 
-pakeista/transformuota parenkant šį slaptažodį, indeksas (pirminė ašies reikšmė 
-parenkant pirmuosius preliminarius slaptažodžius yra lygi nuliui). Galutinių 
-slaptažodžių parinkimo ir preliminarių slaptažodžių transformavimo taisyklės yra 
-tokios:
+Maišos funkcijos yra naudojamos suskaičiuoti slaptažodžių kontrolines sumas - 
+dažnai prie slaptažodžių pridedama papildoma informacija, kuri gali būti saugoma 
+duomenų bazėse arba šifruotų laikmenų antraštėse. Prieš skaičiuojant 
+slaptažodžio kontrolinę sumą, gera praktika yra prie slaptažodžio pridėti 
+papildomą informaciją, kaip pvz. vadinamoji \textquote{druska} (angl. 
+\textquote{salt}), skirta apsunkinti tam tikras slaptažodžių parinkimo atakas 
+(naudojant iš anksto suskaičiuotus slaptažodžių kontrolinių sumų sąrašus, angl. 
+\textquote{Rainbow Tables}). \textquote{Druska} dažnai būna atsitiktiniu būdu
+parinkta simbolių, raidžių ir skaičių seka, kuri yra saugoma kartu su galutine 
+slaptažodžio ir \textquote{druskos} kontroline suma. Kai vartotojas prisijungia 
+prie internetinės svetainės arba įveda kompiuterio skaitmeninės laikmenos 
+iššifravimo slaptažodį, įvestas slaptažodis yra sujungiamas su 
+\textquote{druska} ir palyginamas su turima kontroline suma.
+
+\subsubsubsection{Slaptažodžių parinkimo procesas}
+Slaptažodžių parinkimas šnekamojoje kalboje taip pat vadinamas 
+\textquote{slaptažodžių laužymu} - procesas, kai turimą nežinomo slaptažodžio 
+kontrolinę sumą yra bandoma atspėti parenkant tikrąjį, maišos funkcijos 
+neapdorotą slaptažodį. Turint slaptažodį, kurį norima patikrinti, slaptažodis 
+yra apdorojimas maišos funkcija ir palyginama išvesta kontrolinė suma su turima 
+kontroline suma - jei kontrolinės sumos sutampa, slaptažodis buvo 
+atspėtas/parinktas (\textquote{nulaužtas}).
+
+\subsubsubsection{Mašininis mokymasis}
+Mašininis mokymasis, tame tarpe dirbtinis intelektas ir neuroniniai tinklai, 
+paprastai naudojami duomenų analizei, prognozavimui, klasifikavimui ir naujų 
+duomenų generavimui. Konkretus pritaikymas šiai technologijai yra didiesiems 
+duomenims (angl. \textquote{Big Data}) - masinis kiekis duomenų gali būti 
+naudojami prognozuoti rinkos tendencijas, žmonių elgesį, transformuoti ir 
+generuoti kitus duomenis apmokius kompiuterinį modelį įžvelgti paprastai 
+nematomus parametrus, požymius duomenyse. Mašininio mokymosi modelis - parametrų 
+ir duomenų rinkinys, kurie yra nustatomi, koreguojami ir/ar surenkami modelio 
+apmokymo procese. Išskiriami du pagrindiniai mašininio mokymosi proceso tipai:
+% TODO įdėti panaudojimo atvejus?
+\begin{itemize}
+  \item su mokytoju (angl. \textquote{Supervised Learning}) - mašininio mokymosi 
+    algoritmui yra pateikiami iš anksto suklasifikuoti, apdoroti duomenys, 
+    kuriuose algoritmas turi identifikuoti tokius reikšmingus požymius, kad 
+    modelio priimami sprendimai sutaptų su mokytojo nustatytais sprendimais.
+    Algoritmo pradiniai duomenyse kiekvienai reikšmei yra priskirta tam tikra 
+    žymė (asociacija), ir algoritmas duomenyse esamus požymius (pvz. forma, 
+    struktūra, pasiskirstymą, spalvą ir pan.) susieja su priskirta žyme. 
+    Mokymasis su mokytoju toliau gali būti skirstomi į du tipus:
+    \begin{itemize}
+      \item klasifikacija - priskirti duomenis prie tam tikros klasės, grupės;
+      \item regresija - prognozuoti duomenis, priklausančius nuo kitų duomenų.
+    \end{itemize}
+  \item be mokytojo (angl. \textquote{Unsupervised Learning}) - mašininio 
+    mokymosi algoritmui yra pateikiami \textquote{žali} duomenys, t.y. ne 
+    klasifikuoti ar kitaip apdoroti, ir modelis turi pats identifikuoti, 
+    išskirti duomenyse reikšmingus požymius, ryšius. Mokymasis be mokytojo 
+    toliau gali būti skaidomas į du tipus:
+    \begin{itemize}
+      \item grupavimas - reikšmių padalijimas į grupes, kurios turi panašius 
+        požymius;
+      \item asociacija - taisyklėmis pagrįstas mokymasis, kuriame nustatomi 
+        tarpusavio ryšiai tarp reikšmių.
+    \end{itemize}
+\end{itemize}
+
+\subsection{Brutalios jėgos metodas slaptažodžio parinkimui} 
+\label{sec:bruteforce}
+Jei vartotojas turėtų iki 6 simbolių ilgio slaptažodį, tai programa ar 
+kompiuteris galėtų sugeneruoti visus įmanomus 1-6 simbolių ilgio slaptažodžius, 
+su visomis raidžių, skaičių ir simbolių (mišinių) permutacijomis. Tokiu būdu yra 
+beveik garantuota parinkti sutampantį su vartotojo slaptažodį brutalios jėgos 
+būdu (angl. \textquote{Brute Force}) per palyginti trumpą laiką. Pavyzdžiui, su
+mano 9 metų senumo nešiojamuoju kompiuteriu, kuriame yra Intel i5-2520M 
+procesorius ir Python programine kalba parašytu scenarijumi, pateiktame 
+\ref{fig:kombinacijos} pav., sugeneravau visas 6 simbolių kombinacijas (raidžių 
+aibę sudaro lotyniška abėcėlė) per X minutes, kurios sudaro Y eilutes ir užima Z 
+GB vietos skaitmeninėje laikmenoje (dar bus užpildyta).
+
+\begin{figure}
+  \begin{center}
+    \lstinputlisting[
+      language=Python,
+      numbers=left
+    ]{permutations.py}
+    \caption{Programinis kodas sugeneruoti visas 6 simbolių kombinacijas.}
+  \end{center}
+  \label{fig:kombinacijos}
+\end{figure}
+
+\subsection{Slaptažodžių sąrašai slaptažodžio parinkimui} \label{sec:wordlists}
+Internete paplitusios vartotojų slaptažodžių nutekintos duomenų bazės yra 
+tinkamos slaptažodžių parinkimui. Vartotojai dažnai naudoja tuos pačius 
+slaptažodžius daugeliui savo kuriamų internetinių svetainių paskyrų, tačiau 
+nebūtinai visi šių internetinių svetainių kūrėjai/aptarnautojai laikosi
+informacinės saugos taisyklių ir gerųjų praktikų, tokių, kaip:
 \begin{enumerate}
-  \item preliminariame slaptažodyje simbolių grupė gali būti keičiama tik jei 
-    preliminaraus slaptažodžio ašies vertė yra mažesnė už grupės indeksą 
-    slaptažodžio gramatikoje;
-  \item preliminaraus slaptažodžio nauja ašis yra slaptažodyje pakeistos 
-    simbolių grupės indeksas, skaičiuojant nuo 0;
-  \item iš preliminaraus slaptažodžio yra parenkamas galutinis slaptažodis kai 
-    yra pakeičiama viena ir tik viena simbolių grupė.
+  \item nesaugoti slaptažodžius paprastu tekstu (angl. \textquote{Plain Text});
+  \item apdoroti slaptažodžius stipriomis kriptografinėmis maišos funkcijomis;
+  \item su \textquote{druska} apsaugoti slaptažodžius nuo dažniausiai naudojamų 
+        atakų, kaip pateikta \ref{sec:hashing} skyriuje.
 \end{enumerate}
 
-Vaduvaujantis aukščiau minėtomis taisyklėmis yra parenkami nauji galutiniai ir 
-preliminarūs slaptažodžiai su transformuotomis simbolių grupėmis. Galutinis 
-slaptažodis gali būti taikomas vartotojo kokio nors slaptažodžio atkūrimui iš 
-maišos funkcijos išvestos kontrolinės sumos (pvz. MD5, SHA-1 ar kitos maišos 
-funkcijos). Nauji preliminarūs slaptažodžiai yra grąžinami algoritmui, tolesnėms 
-transformacijoms, kol iš preliminaraus slaptažodžio gramatikos bei atitinkamų 
-simbolių grupių galima sujungti/transformuoti naujas reikšmes.
+Kai veikėjas (asmuo, programa) įsiveržia į tokias internetines svetaines ir 
+nutekina prisiregistravusių vartotojų asmeninius duomenis, tame tarpe ir 
+prisijungimo slaptažodžius, jie būna parduodami internete arba patalpinami 
+nemokamai laisvai prieinamuose internetinėse svetainėse.
+% TODO Gal įdėti pavyzdžių kokių nors populiariausių tokių wordlistų?
+Naudojantis šias duomenų bazes su vartotojų prisijungimo informacija, kiekvienas 
+slaptažodis yra apdorojimas maišos funkcija ir jos išvesta kontrolinė suma 
+palyginama su turimomis nežinomomis slaptažodžių kontrolinių sumomis.
 
-\subsection{\textquote{PassGAN} Algoritmas}
+\subsection{Slaptažodžių kontrolinių sumų sąrašai slaptažodžio parinkimui} 
+\label{sec:rainbowtables}
+Slaptažodžių apdorojimui į kontrolines sumas, naudojant kriptografines maišos 
+funkcijas, tokiais dideliais kiekiais, kaip nutekintų slaptažodžių duomenų 
+bazių, reikalingi dideli kompiuteriniai ištekliai. Siekiant minimizuoti laiką, 
+skirtą slaptažodžio parinkimui, nutekintos slaptažodžių duomenų bazės (ar jų 
+mišinio) slaptažodžiai yra iš anksto apdorojami kriptografinės maišos funkcijos 
+(toks metodas vadinamas angl. \textquote{Rainbow Tables}). Tokiu būdu, 
+slaptažodžio užpuolikui, siekiančiam nustatyti tikrąją slaptažodžio reikšmę, 
+reikia tik palyginti kontrolines sumas ir surasti, jei tokia yra, sutampančią. 
+Kaip minėta \ref{sec:hashing} skyriuje, tokio tipo ataka netinkama 
+slaptažodžiams, kurie yra apsaugoti su \textquote{druska}, kadangi kontrolinės 
+sumos skirtųsi net ir jeigu tikra slaptažodžio reikšmė sutampa.
+
+Paminėtina, kad naudojantis tokiais sugeneruotais sąrašais, kaip pateikta 
+\ref{sec:bruteforce}, \ref{sec:wordlists} ir \ref{sec:rainbowtables} skyriuose, 
+vartotojas galėtų paskirstyti skaičiavimus (slaptažodžio parinkimą) kelioms 
+procesoriaus gijoms, vaizdo plokštėms ar kompiuteriams slaptažodžių sąrašą 
+padalinant į dalis, siekiant pagreitinti slaptažodžio parinkimą.
+
+\subsection{Slaptažodžių transformavimas naudojant taisykles}
+Atvirojo kodo programinė įranga \textquote{hashcat}\footnotemark, skirta 
+slaptažodžių atstatymui - nustato tikrąjį slaptažodį taikant brutalios jėgos ir 
+kt. metodus turimo slaptažodžio kontrolinei sumai - palaiko teksto eilučių 
+(slaptažodžių) transformavimą taisyklėmis. Taisyklės yra tekstiniai failai, 
+kuriose yra pateiktos instrukcijos kaip transformuoti 
+
+\footnotetext{
+  Programinės įrangos internetinė svetainė: \url{https://hashcat.net/hashcat/}.
+}
+
+\subsection{Ankstesni darbai}
+Automatizuoto slaptažodžio parinkimo metodų srityje yra atlikti moksliniai 
+tyrimai, nagrinėjantys galimybes pritaikyti ir integruoti mašininį mokymąsi bei 
+kitus metodus, kad slaptažodžio parinkimo procesas sudėtingesniems, nei 1-6 
+simbolių ilgio slaptažodžiams, vyktų lengviau (greičiau). Šie metodai 
+automatizuotu būdu generuoja taisykles iš pradinių duomenų (paprastai naudojamos 
+nutekintos slaptažodžių duomenų bazės), ir pagal sugeneruotas taisykles - naujus 
+slaptažodžius. Žemiau yra paminėti keli tokie metodai:
+\begin{enumerate}
+  \item \textquote{PassGAN} - paremtas mašininio mokymosi generatyviniais 
+    konkurenciniais tinklais;
+  \item \textquote{PCFG} - paremtas tikimybine bekontekste gramatika;
+  \item \textquote{GenPASS} - pagrįstas mašininio mokymosi pasikartojančiais 
+    neuroniniais tinklais ir tikimybiniais gramatikos taisyklių rinkiniais;
+  \item \textquote{TG-SPSR} - slaptažodžių parinkimo strategija, pagrįsta 
+    tikimybiniais gramatikos taisyklių rinkiniais ir Markovo grandinių 
+    modeliais.
+\end{enumerate}
+% Ne tik pasakyti ką atliko kiti autoriai, bet palyginti jų darbus, pateikti tų 
+% darbų pliusus ir minusus
+
+% Kaip veikia šitas algoritmas, pateikti pavyzdžių (įdėti transformacijų medį)
+
+% Kokie šio algoritmo pagrindiniai požymiai, pastebėti trūkumai ir minusai
+% TODO parasyti apie kitus algoritmus
+% idet kas yra masininis mokymasis ir pan, viska aprasyt kad belekas suprastu,
+% isivaizduot kad bet kokios srities zmogus skaito, ir aprasyt taip, kad 
+% suprastu
+
+\subsection{\textquote{PassGAN} metodas}
+Šioje dalyje apibendrinsiu generatyvinius konkurencinius tinklus, pagal kuriuos 
+yra pagrįstas \textquote{PassGAN} metodas, bei pateiksiu esminius automatizuoto 
+slaptažodžių parinkimo realizacijos bruožus.
+
+% Kas yra GANai
+% Pritaikymas slaptažodžių parinkimo srityje
+% Kaip algoritmas veikia
 \subsubsection{Apie generatyvinius konkurencinius tinklus}
-Generatiniai konkurenciniai tinklai (angl. \textquote{Generative Adversarial 
+Generatyviniai konkurenciniai tinklai (angl. \textquote{Generative Adversarial 
 Networks}, \textquote{GAN}) yra generatyvinis modeliavimas naudojant gilaus 
-mašininio mokimosi metodus. Generatyvinis modeliavimas yra mašininio mokymosi 
+mašininio mokymosi metodus. Generatyvinis modeliavimas yra mašininio mokymosi 
 metodas be mokytojo, kuriame modelis yra apmokamas generuoti tokias reikšmes, 
 kurios galėtų tikėtinai būti iš apmokymo duomenų rinkinio. Generatyviniame 
 konkurenciniame tinkle yra dvi dalys - generavimo modelis (angl. 
-\textquote{Generator model}), kuris yra apmokamas generuoti naujas reikšmes, ir 
+\textquote{Generator Model}), kuris yra apmokamas generuoti naujas reikšmes, ir 
 diskriminatoriaus modelis (angl. \textquote{Discriminator model}), kuris 
-klasifikuoja generuojamas reikšmes kaip tikras arba netikras. Generativinių 
+klasifikuoja generuojamas reikšmes kaip tikras arba netikras. Generatyvinių 
 konkurencinių tinklų pagrindas yra teoriškas žaidybinis scenarijus, kuriame 
 minėti du modeliai konkuruoja ir varžosi - vienas modelis generuoja reikšmes, 
 kitas bando atskirti jas nuo generatoriaus ir apmokymo duomenų 
@@ -182,6 +357,95 @@ pritaikytas slaptažodžių generavimui, yra reikalingi palyginti
 
 \cite{DBLP:journals/corr/abs-1709-00440}
 
+\subsection{\textquote{PCFG} Algoritmas}
+\subsubsection{Natūralios kalbos apdorojimas}
+Parašyti apie NLP sritį, kaip ji siejasi su gramatikomis ir pan.
+
+\subsubsection{Apie tikimybines, bekontekstes gramatikas}
+\textquote{PCFG} (angl. \textquote{Probabilistic Context Free Grammar}) - 
+tikimybinis gramatikos taisyklių rinkinys, nurodantis, kaip kažkurį tai 
+simbolį-reikšmę galima transformuoti į kitą simbolį. \textquote{PCFG} algoritmas 
+yra pagrįstas bekontekste gramatika (angl. \textquote{Context Free Grammar}) - 
+notacija, skirtą apibrėžti tam tikros formalios kalbos sintaksę, pvz. 
+programinio kodo šaltinių failų analizei ir apdorojimui į simbolių grupių 
+leksinį medį (kaip simbolių grupės yra susijusios su viena kita, ką jos 
+reiškia). Tikimybinė bekontekstė gramatika (angl. \textquote{Probabilistic 
+Context Free Grammar}) yra bekontekstė gramatika, kurioje kiekvienai simbolių 
+grupei yra priskirta tikimybė. Tikimybinė bekontekstė gramatika yra kilusi iš 
+kompiuterinės lingvistikos srities, skirta analizuoti ir modeliuoti natūralią 
+kalbą - simbolių grupių (pasikartojimo) tikimybės gali būti naudojamos kaip 
+parametrai mašininio mokymosi modelyje, tačiau tikimybių reikšmės ypač priklauso 
+nuo duomenų (kiekio, įvairovės), iš kurių jos yra išvestos.
+
+\subsubsection{Pritaikymas slaptažodžių parinkimui}
+Tikimybinės bekontekstės gramatikos metodą galima pritaikyti ir slaptažodžių 
+gramatikos (formalios kalbos notacijos) nustatymui, ir, pagal šią gramatiką, 
+parinkti naujus slaptažodžius. Naujų slaptažodžių parinkimui yra saugomos 
+simbolių grupių reikšmės - slaptažodžiai yra dalinami ir sugrupuojami į 
+sujungtas skaitmenų, raidžių ir specialiųjų simbolių grupes, kurios yra 
+įstatomos į slaptažodžio gramatiką parenkant naujus slaptažodžius.
+
+\subsubsection{Algoritmas}
+Slaptažodžių parinkimo strategijoje, \textquote{PCFG} algoritmas kiekvienam 
+slaptažodžiui iš apmokymo duomenų rinkinio pirmiausia išveda gramatiką, t.y. 
+simbolių grupės yra sugrupuojamos pagal tipą: skaitmenys, raidės, specialūs 
+simboliai ir kartu užfiksuojami su konkrečių simbolių sekų bei pačios gramatikos 
+pasikartojimų skaičiumi medžio pagrindo duomenų struktūroje (paprastai binarinis 
+medis, angl. \textquote{Binary Tree}). Kai visi slaptažodžiai yra apdoroti į jų 
+atitinkamas gramatikas, paskaičiuojami gramatikų ir simbolių grupių 
+pasikartojimo dažniai - kiek kartų gramatika ir ją sudarančios simbolių grupių 
+reikšmės pasikartoja visoje apmokymo duomenų aibėje. Minėti dažniai yra 
+naudojami parenkant naujus slaptažodžius - pirmiausia parenkami slaptažodžiai, 
+kurių gramatika ir gramatikoje esančių simbolių grupių dažniai yra didžiausi, 
+tokiu būdu slaptažodžiai su aukščiausia tikimybe yra parenkami pirmi. Kitaip 
+tariant, slaptažodžiai, kurių forma, struktūra ir skaitmenų, raidžių, specialių 
+simbolių junginių grupės pasikartoja daugiausiai, sudaro šio metodo pirmąsias 
+išvestis.
+Viena gramatika \textquote{PCFG} algoritme gali būti panaudota kelis kartus 
+parenkant slaptažodžius. \textquote{PCFG} algoritme yra išskiriami du tipai 
+slaptažodžių - preliminarūs (angl. \textquote{Pre-terminal}) ir galutiniai 
+(angl. \textquote{Terminal}). Kiekvienas preliminarus slaptažodis yra parenkamas 
+atsižvelgiant į jo ašies reikšmę, t.y. simbolių grupės, kuri buvo 
+pakeista/transformuota parenkant šį slaptažodį, indeksas (pirminė ašies reikšmė 
+parenkant pirmuosius preliminarius slaptažodžius yra lygi nuliui). Galutinių 
+slaptažodžių parinkimo ir preliminarių slaptažodžių transformavimo taisyklės yra 
+tokios:
+\begin{enumerate}
+  \item preliminariame slaptažodyje simbolių grupė gali būti keičiama tik jei 
+    preliminaraus slaptažodžio ašies vertė yra mažesnė už grupės indeksą 
+    slaptažodžio gramatikoje;
+  \item preliminaraus slaptažodžio nauja ašis yra slaptažodyje pakeistos 
+    simbolių grupės indeksas, skaičiuojant nuo 0;
+  \item iš preliminaraus slaptažodžio yra parenkamas galutinis slaptažodis kai 
+    yra pakeičiama viena ir tik viena simbolių grupė.
+\end{enumerate}
+
+Vadovaujantis aukščiau minėtomis taisyklėmis yra parenkami nauji galutiniai ir 
+preliminarūs slaptažodžiai su transformuotomis simbolių grupėmis. Galutinis 
+slaptažodis algoritmo yra grąžinamas, kai nebėra daugiau transformacijų, kurios 
+galėtų būti su juo atliktos, o nauji preliminarūs slaptažodžiai, kuriems jau 
+buvo atliktos transformacijos, yra grąžinami į algoritmo sąrašą tolesnėms 
+transformacijoms.
+
+\subsubsection{Pastebėjimai}
+Algoritmas pabaigą pasiekia tada, kai gramatikos arba unikalios simbolių grupės 
+pasibaigia ir/arba naujiems slaptažodžiams parinkti trūksta duomenų - raidžių, 
+skaitmenų ar specialių simbolių junginių. Parenkamų slaptažodžių bei gramatikų 
+ir simbolių grupių kiekiai priklauso nuo apmokymo duomenų rinkinio dydžio - yra 
+svarbu pateikti ne didelį duomenų kiekį, bet duomenis, kuriose yra daug 
+pasikartojančių reikšmių. Šios pasikartojančios reikšmės yra naudojamos 
+tikimybių skaičiavimams ir turi įtaką, kokie slaptažodžiai bus parenkami 
+slaptažodžių parinkimo proceso pradžioje.
+Algoritmas slaptažodžius parinks tik tokius, kurių gramatikos buvo užfiksuotos 
+apmokymui pateiktų slaptažodžių aibėje - 
+
+% TODO Giliau panagrineti problema, duoti konkreciu pavyzdziu pvz is Passware, 
+% sifruota particija su LUKS
+
+% Naudoti kita PCFG implementacija, o ne mano, geresni skaiciai gausis tada
+% galima rasyti, kad tipo realizacija paremta pagal tokie ir toki projekta,
+% det isnasa i konkrecia nuoroda
+
 \section{Pagrindinė tiriamoji dalis}
 Pagrindinėje tiriamojoje dalyje aptariama ir pagrindžiama tyrimo metodika;
 pagal atitinkamas darbo dalis, nuosekliai, panaudojant lyginamosios analizės,
@@ -203,12 +467,12 @@ sudėtingumas ir struktūra. Slaptažodžiai, kurie galėtų būti naudojami
 identifikuoti vartotojus, nebuvo atskleisti. Vartotojų asmeninė informacija yra 
 nepateikta.
 
-\subsection{Nutekintų slaptažodžių duomenų bazių analizė}
-Šiame darbe naudojamos trys nutekintų slaptažodžių duomenų bazės - A, B ir C. 
-Duomenų bazę (rinkinį) C sudaro slaptažodžių SHA-1 maišos funkcijos kontrolinės 
-sumos. Dešimt dažniausiai pasikartojančių slaptažodžių duomenų bazėje A yra 
-pateikti \ref{10-dazn-slapt-a} lentelėje, o duomenų bazėje B - 
-\ref{10-dazn-slapt-b} lentelėje.
+\subsection{Nutekintų slaptažodžių duomenų bazių analizė} \label{sec:db-analize}
+Šiame darbe naudojamos dvi nutekintų slaptažodžių duomenų bazės, atvirai 
+prieinamos viešais šaltiniais - RockYou ir . Duomenų bazę (rinkinį) C sudaro 
+slaptažodžių SHA-1 maišos funkcijos kontrolinės sumos. Dešimt dažniausiai 
+pasikartojančių slaptažodžių duomenų bazėje A yra pateikti \ref{10-dazn-slapt-a} 
+lentelėje, o duomenų bazėje B - \ref{10-dazn-slapt-b} lentelėje.
 
 % $ sort DB.txt | uniq -c | sort -nr | head -n 10
 \begin{table}[hb]
@@ -262,57 +526,62 @@ Kaip yra pavaizduota \ref{10-dazn-slapt-b} lentelėje, kitaip nei
 \ref{10-dazn-slapt-a} lentelėje, dauguma slaptažodžių yra sudėtingesni skaičių 
 ir simbolių sekų mišiniai, kuriuose bendriniai daiktavardžiai yra retesni.
 
-% https://shantoroy.com/latex/line-graph-pgfplots/
-\begin{tikzpicture}
-\begin{axis}[
-  xlabel=Sugeneruotų slaptažodžių kiekis, vnt.,
-  ylabel=Sutampančių slaptažodžių kiekis, vnt.,
-  width=10cm,height=7cm,
-  legend style={at={(0.0,.91)},anchor=west}
-]
-
-% Add values and attributes for the first plot
-\addplot[color=red,mark=*] coordinates {
-  (10^6, 6)
-  (10^7, 7)
-  (10^8, 8)
-  (10^9, 9)
-  (10^10, 10)
-};
-
-% Add values and attributes for the second plot
-\addplot[color=blue,mark=*] coordinates {
-  (10^6, 8)
-  (10^7, 9)
-  (10^8, 10)
-  (10^9, 11)
-  (10^10, 12)
-};
-
-\legend{Case 1,Case 2}
-\end{axis}
-\end{tikzpicture}
-
+\begin{figure}[!ht]
+  \begin{center}
+    \begin{tikzpicture}
+      \begin{axis}[
+        xlabel={Sugeneruoti slaptažodžiai},
+        ylabel={Sutampantys slaptažodžiai},
+        x unit={vnt.},
+        y unit={vnt.},
+        grid=major,
+        grid style={dashed,gray!30},
+        width=10cm,
+        height=7cm,
+        legend style={at={(0.5,-0.2)}, anchor=north}
+      ]
+      \addplot[color=red, mark=*]
+        table[x=column 1, y=column 2, col sep=comma]{table1.csv};
+      \addplot[color=blue, mark=*]
+        table[x=column 1, y=column 2, col sep=comma]{table2.csv};
+      \legend{Case 1,Case 2}
+      \end{axis}
+    \end{tikzpicture}
+    \ref{plot-1}
+    \caption{Plot.}
+  \end{center}
+\end{figure}
 
 \subsection{Eksperimentuose taikoma strategija}
-Su pasirinktu automatizuoto slaptažodžių parinkimo metodu, apmokyti modelį su 80 
-\% duomenų iš duomenų rinkinių A ir B, bei sumaišyto A ir B duomenų rinkinio. 
-Apmokytu modeliu sugeneruoti tarp $10^{6}$ ir $10^{10}$ slaptažodžių, ir, 
-naudojantis specialia programine įranga \textquote{Hashcat}, nustatyti, kiek 
-slaptažodžių iš sugeneruotų slaptažodžių aibės sutampa su duomenų rinkinyje C 
-slaptažodžiais.
-
-\subsection{\textquote{PCFG} eksperimentų serija}
+Su pasirinktu automatizuoto slaptažodžių parinkimo metodu bus apmokytas modelis 
+su 80\% duomenų nuo visos pasirinktos nutekintos slaptažodžių duomenų bazės 
+įrašų aibės, likusieji 20\% bus naudojami testavimui. Nutekintoms slaptažodžių 
+duomenų bazėms, kurios minėtos ir analizuotos \ref{sec:db-analize} skyriuje, bus 
+naudojamos modelių apmokymui. Siekiant įvertinti automatizuoto slaptažodžio 
+parinkimo metodo efektyvumą, bus generuojami tarp $10^{6}$ ir $10^{10}$ 
+slaptažodžių, kurie bus testuojami su 20\% įrašų iš apmokymui naudojamos duomenų 
+bazės testavimo duomenų aibės, ir su kita, anksčiau nematyta nutekinta 
+slaptažodžių duomenų baze. Slaptažodžių kiekis, sutampančių su 20\% testavimo 
+duomenų aibės slaptažodžiais ir su kitoje nutekintoje duomenų bazėje esančiais 
+slaptažodžiais, bus fiksuojamas kiekvienai sugeneruotų slaptažodžių rinkiniui.
 
 \subsection{\textquote{PassGAN} eksperimentų serija}
+
+\subsection{\textquote{PCFG} eksperimentų serija}
 
 \sectionnonum{Išvados}
 Išvadose ir pasiūlymuose, nekartojant atskirų dalių apibendrinimų,
 suformuluojamos svarbiausios darbo išvados, rekomendacijos bei pasiūlymai.
+% Ar atlikta studija sėkmingai išsprendė užsibrėžtą tikslą?
+% Kokie apribojimai buvo taikomi, kurie trukdė atlikti tyrimą?
+% Ar gauti rezultatai yra patikimi?
+% Ar buvo atliktas palyginimas su kitų autorių analogiškais rezultatais?
+% Kaip rezultatai gali būti panaudoti ateityje?
+% Kokio tipo naują informaciją/sprendimą/tyrimą galima pažymėti?
+% Kokias naujas idėjas ir pasiūlymus iškelia gauti rezultatai?
 
 \sectionnonum{Conclusions}
 Šiame skyriuje pateikiamos išvados (reziume) anglų kalba.
-
 
 \printbibliography[heading=bibintoc]
 
