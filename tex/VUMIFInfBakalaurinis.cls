@@ -77,11 +77,11 @@
 
 % Nustatomas bibliografijos stilius
 \RequirePackage[
-    alldates=iso8601,
+    alldates=iso,
     autolang=other,
     backend=biber,
     sortcites=true,
-    style=trad-alpha,
+    style=numeric,
     abbreviate=true,
     minalphanames=3,
     maxalphanames=3,
