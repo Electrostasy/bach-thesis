@@ -52,7 +52,6 @@
 Sutartinių ženklų, simbolių, vienetų ir terminų sutrumpinimų sąrašas (jeigu
 ženklų, simbolių, vienetų ir terminų bendras skaičius didesnis nei 10 ir
 kiekvienas iš jų tekste kartojasi daugiau nei 3 kartus).
-% Sudeti daznai naudotas savokas cia kad nesikartotu tekste
 
 \section{Santrauka}
 Santrauka lietuviškai.
@@ -398,11 +397,13 @@ konkurenciniame tinkle yra dvi dalys -- generavimo modelis (angl.
 \textquote{Generator Model}), kuris yra apmokamas generuoti naujas reikšmes, ir 
 diskriminatoriaus modelis (angl. \textquote{Discriminator model}), kuris 
 klasifikuoja generuojamas reikšmes kaip tikras arba netikras. Generatyvinių 
-konkurencinių tinklų pagrindas yra teoriškas žaidybinis scenarijus, kuriame 
-minėti du modeliai konkuruoja ir varžosi -- vienas modelis generuoja reikšmes, 
-kitas bando atskirti jas nuo generatoriaus ir apmokymo duomenų \cite{DL}. 
-Generavimo modelis yra apmokamas tol, kol generuoja tokias įtikinamas reikšmes, 
-kurias diskriminatoriaus modelis negali atskirti nuo realių (apmokymo) reikšmių.
+konkurencinių tinklų pagrindas yra žaidimas tarp dviejų konkuruojančių 
+neuroninių tinklų, kuriame minėti du modeliai konkuruoja ir varžosi -- vienas 
+modelis generuoja reikšmes, kitas bando atskirti jas nuo generuotų duomenų ir 
+apmokymo duomenų \cite{DL,GAN}. Generavimo modelis yra apmokamas tol, kol 
+generuoja tokias įtikinamas reikšmes, kurias diskriminatoriaus modelis negali 
+atskirti nuo realių (apmokymo) reikšmių, t.y. generavimo modelis apmokamas tol, 
+kol neapgauna diskriminatoriaus modelio \cite{GAN}.
 
 Pagrindinis skirtumas tarp diskriminuojančio ir generatyvinio modeliavimo yra 
 tai, diskriminacinis modelis klasifikuoja -- turi būti priimtas sprendimas, 
@@ -414,20 +415,33 @@ kurios galėtų tikėtinai būti priskirtos prie pradinių duomenų \cite{PRaML}
 
 Generavimo modeliui yra pateikiama kaip įvestis nustatyto ilgio vektorius iš 
 atsitiktinai paskirstytos duomenų aibės (angl. \textquote{Gaussian 
-distribution}). Apmokymo metu tam tikriems (paprastai nematomiems) požymiams iš 
+Distribution}). Apmokymo metu tam tikriems (paprastai nematomiems) požymiams iš 
 šios duomenų aibės yra priskiriama svarba, t.y. generuojamos reikšmės artėja 
 prie apmokymo duomenų aibės -- generatorius sugeneruoja grupę reikšmių, kurios, 
 kartu su apmokymo duomenimis, yra perduodami diskriminatoriui klasifikuoti kaip 
-tikros arba netikros. Tokiu būdu diskriminatoriaus parametrai yra tobulinami 
-tiksliau klasifikuoti tikras/netikras reikšmes, o generatorius -- kiek 
-sugeneruotos reikšmės galėjo apgauti/įtikinti diskriminatorių (diskriminatoriaus 
-reikšmės, nustatytos kaip tikros arba netikros, atskleidžia reikalingą 
-informaciją apie apmokymo duomenų aibę generatoriui, kuris gali ją naudoti 
-tiksliau modeliuoti apmokymo duomenų pasiskirstymą). Po modelio apmokymo, minėta 
-duomenų aibė turėtų atitikti apmokymo duomenų aibę, t.y. diskriminatorius negali 
-su didesniu nei apie 50 \% tikslumu (pasitikėjimu, arba angl. 
-\textquote{Confidence}) atskirti apmokymo duomenų aibės reikšmes nuo generuojamų 
-reikšmių.
+tikros arba netikros. Tokiu būdu kiekvieną apmokymo iteraciją diskriminatoriaus 
+parametrai yra tobulinami tiksliau klasifikuoti tikras/netikras reikšmes, o 
+generatorius -- kiek sugeneruotos reikšmės galėjo apgauti/įtikinti 
+diskriminatorių (diskriminatoriaus reikšmės, nustatytos kaip tikros arba 
+netikros, atskleidžia reikalingą informaciją apie apmokymo duomenų aibę 
+generatoriui, kuris gali ją naudoti tiksliau modeliuoti apmokymo duomenų 
+pasiskirstymą). Po modelio apmokymo, minėta duomenų aibė turėtų modeliuoti 
+apmokymo duomenų aibę, t.y. diskriminatorius negali su didesniu nei apie 50 \% 
+tikslumu (pasitikėjimu, arba angl. \textquote{Confidence}) atskirti apmokymo 
+duomenų aibės reikšmes nuo generuojamų reikšmių.
+
+\subsubsubsection{Neuroninių tinklų struktūros}
+Šiame metode naudojamas generatyvinis konkurencinis tinklas su struktūra, 
+paremta \cite{GAN}, kuri yra pateikta \ref{plot:passgang}, \ref{plot:passgand} 
+pav., ir \textquote{ADAM} optimizatorius \cite{ADAM} siekiant minimizuoti 
+apmokymo klaidą (angl. \textquote{Training Error}).
+
+
+
+
+Aprašyti neuroninio tinklo struktūrą, paaiškinti straipsnyje pasirinktus 
+sprendimus/priežastis, kokie parametrai ir koks optimizatorius naudojamas ir 
+kodėl.
 
 \subsubsubsection{Pritaikymas slaptažodžių parinkimui}
 Generatyviniai konkurenciniai tinklai gali būti taikomi ir naujų slaptažodžių 
@@ -436,15 +450,102 @@ slaptažodžių duomenų bazių -- generavimo modelis išmoksta slaptažodžių 
 pagal tai, ar generuojami slaptažodžiai suklasifikuoti kaip tikri ar ne tikri 
 diskriminatoriaus modelio.
 
-\subsubsubsection{Neuroninio tinklo struktūra}
-Aprašyti neuroninio tinklo struktūrą, paaiškinti straipsnyje pasirinktus 
-sprendimus/priežastis, kokie parametrai ir koks optimizatorius naudojamas ir 
-kodėl.
-
 \subsubsubsection{Pastebėjimai}
 \textquote{PassGAN} metodas parenka daugiau slaptažodžiu su didesniu kiekiu 
 generuojamų slaptažodžių, t.y. kuo didesnis sugeneruotų slaptažodžių kiekis, tuo 
-daugiau parenkamų slaptažodžių nežinomų slaptažodžių aibėje.
+daugiau parenkamų slaptažodžių nežinomų slaptažodžių aibėje -- šio metodo 
+moksliniame straipsnyje atliktas tyrimas parodo, kad modelis, apmokytas su 80 \% 
+\textquote{RockYou} nutekintos slaptažodžių duomenų bazės rinkinio slaptažodžių 
+aibe, testuojamas su 20 \% tos pačios duomenų bazės testavimo duomenų ir 
+\textquote{Linknedin} duomenų aibėmis, parenka slaptažodžius kiekiais, 
+apibrėžtais \ref{tab:passganoriginalrockyouresults}, 
+\ref{tab:passganoriginallinkedinresults} lent., kurioje matyti, kad su kuo 
+didesniu kiekiu sugeneruotų slaptažodžių, tuo didesnis yra parinktų slaptžodžių 
+skaičius testavimo duomenų aibėje. Pastebėtina, kad iš $10^10$ sugeneruotų 
+slaptažodžių tik $21.5282$ \% sudaro unikalios reikšmės, t.y. $78.4718$ \% visų 
+slaptažodžių yra dublikatai.
+
+\begin{table}[hb]
+  \centering
+  \caption{
+    Slaptažodžių, sugeneruotų \textquote{PassGAN} metodu, apmokytų 80 \% 
+    \textquote{RockYou} duomenų ir sutampančių su \textquote{RockYou} testavimo 
+    duomenų aibe \cite{PassGAN}.
+  }
+  \begin{tabular}{|c|c|c|}
+    \hline \textbf{Slaptažodžių kiekis} & \textbf{Unikalūs slaptažodžiai} & 
+    \textbf{Sutampančių slaptažodžių kiekis} \\
+    \hline $10^4$ & 9738 & $0.005$ \% \\
+    \hline $10^5$ & 94400 & $0.048$ \% \\
+    \hline $10^6$ & 855972 & $0.381$ \% \\
+    \hline $10^7$ & 7064483 & $2.038$ \% \\
+    \hline $10^8$ & 52815412 & $6.726$ \% \\
+    \hline $10^9$ & 356216832 & $15.094$ \% \\
+    \hline $10^{10}$ & 2152819961 & $26.036$ \% \\
+    \hline
+  \end{tabular}
+  \label{tab:passganoriginalrockyouresults}
+\end{table}
+
+% \begin{table}[hb]
+%   \centering
+%   \caption{
+%     Slaptažodžių, sugeneruotų \textquote{PassGAN} metodu, apmokytų 80 \% 
+%     \textquote{RockYou} duomenų ir sutampančių su \textquote{Linkedin} testavimo 
+%     duomenų aibe \cite{PassGAN}.
+%   }
+%   \begin{tabular}{|c|c|}
+%     \hline \textbf{Slaptažodžių kiekis} & \textbf{Sutampančių slaptažodžių 
+%     kiekis} \\
+%     \hline $10^4$ & $0.005$ \% \\
+%     \hline $10^5$ & $0.048$ \% \\
+%     \hline $10^6$ & $0.381$ \% \\
+%     \hline $10^7$ & $2.038$ \% \\
+%     \hline $10^8$ & $6.726$ \% \\
+%     \hline $10^9$ & $15.094$ \% \\
+%     \hline $10^{10}$ & $26.036$ \% \\
+%     \hline
+%   \end{tabular}
+%   \label{tab:passganoriginallinkedinresults}
+% \end{table}
+
+Atlikus analizę \textquote{PassGAN} metodu sugeneruotų slaptažodžių dublikatų 
+kiekio, rezultatai pateikti \ref{plot:passganoriginalresults} pav.
+
+\begin{figure}[!ht]
+  \begin{center}
+    \begin{tikzpicture}
+      \begin{axis}[
+        ybar,
+        xlabel={Sugeneruoti slaptažodžiai},
+        ylabel={Unikalūs slaptažodžiai},
+        x unit={vnt.},
+        y unit={\%},
+        ymin=0,
+        ymax=100,
+        xticklabels={,,$10^4$,$10^5$,$10^6$,$10^7$,$10^8$,$10^9$,$10^{10}$},
+        grid=major,
+        grid style={dashed,gray!30},
+        width=10cm,
+        height=7cm,
+      ]
+      \addplot coordinates {
+        (1, 97.38)
+        (2, 94.4)
+        (3, 85.5972)
+        (4, 70.64483)
+        (5, 52.815412)
+        (6, 35.621683)
+        (7, 21.5282)
+      };
+      \end{axis}
+    \end{tikzpicture}
+  \end{center}
+  \caption{
+    Unikalių slaptažodžių, sugeneruotų \textquote{PassGAN} metodu, kiekis.
+  }
+  \label{plot:passganoriginalresults}
+\end{figure}
 
 \subsubsection{\textquote{PCFG} metodas}
 \subsubsubsection{Apie tikimybinės, bekontekstes gramatikas}
@@ -471,7 +572,7 @@ simbolių grupių reikšmės -- slaptažodžiai yra dalinami ir sugrupuojami į
 sujungtas skaitmenų, raidžių ir specialiųjų simbolių grupes, kurios yra 
 įstatomos į slaptažodžio gramatiką parenkant naujus slaptažodžius.
 
-\subsubsubsection{Algoritmas}
+\subsubsubsection{Algoritmo apžvalga} \label{sec:pcfgalg}
 Slaptažodžių parinkimo strategijoje, \textquote{PCFG} algoritmas kiekvienam 
 slaptažodžiui iš apmokymo duomenų rinkinio pirmiausia išveda gramatiką, t.y. 
 simbolių grupės yra sugrupuojamos pagal tipą: skaitmenys, raidės, specialūs 
@@ -508,10 +609,111 @@ tokios:
 
 Vadovaujantis aukščiau minėtomis taisyklėmis yra parenkami nauji galutiniai ir 
 preliminarūs slaptažodžiai su transformuotomis simbolių grupėmis. Galutinis 
-slaptažodis algoritmo yra grąžinamas, kai nebėra daugiau transformacijų, kurios 
+slaptažodis yra grąžinamas algoritmo, kai nebėra daugiau transformacijų, kurios 
 galėtų būti su juo atliktos, o nauji preliminarūs slaptažodžiai, kuriems jau 
 buvo atliktos transformacijos, yra grąžinami į algoritmo sąrašą tolesnėms 
 transformacijoms.
+
+Imant konkretų pavyzdį, tarkime metodas apdorojo slaptažodžių sąrašą ir sudarė 
+sąrašą gramatikų ir raidžių, specialių simbolių, skaitmenų, bei jų pasikartojimo 
+tikimybėmis. Šiam pavyzdžiui minėtas raidžių, specialių simbolių ir skaitmenų 
+sąrašas pateiktas \ref{tab:pcfgvalues} lent.
+\begin{table}[hb]
+  \centering
+  \caption{
+    Slaptažodžių kiekių augimas priklausant nuo slaptažodžio ilgio, 95 simbolių 
+    aibėje (\textquote{ASCII} koduotėje).
+  }
+  \begin{tabular}{|c|c|c|}
+    \hline \textbf{Gramatikos grupė} & \textbf{Reikšmė} & \textbf{Tikimybė} \\
+    \hline A4 & pass & 0.8 \\
+    \hline A3 & App & 0.75 \\
+    \hline A3 & dSA & 0.74 \\
+    \hline A3 & aOS & 0.72 \\
+    \hline A2 & qw & 0.68 \\
+    \hline S3 & \^\&* & 0.64 \\
+    \hline S2 & !* & 0.55 \\
+    \hline S2 & @@ & 0.48 \\
+    \hline S2 & .( & 0.45 \\
+    \hline S1 & \% & 0.36 \\
+    \hline S1 & \$ & 0.3 \\
+    \hline D3 & 123 & 0.25 \\
+    \hline D2 & 33 & 0.25 \\
+    \hline D2 & 47 & 0.24 \\
+    \hline D2 & 29 & 0.12 \\
+    \hline
+  \end{tabular}
+  \label{tab:pcfgvalues}
+\end{table}
+Tarkime, kad pirmoji (aukščiausios tikimybės) slaptažodžio gramatika yra 
+\textquote{A3S2D2}, kurią galima skaityti taip -- slaptažodį sudaro trys raidės, 
+du specialiūs simboliai ir du skaitmenys. Ši gramatika buvo sugeneruota metodui 
+išanalizavus slaptažodžius, kurių daugumą sudarė aukščiau minėta struktūra ir 
+forma, neatsižvelgiant į kokios raidės, specialūs simboliai ir skaitmenys minėtą 
+gramatiką sudarė. Inicijavus šią gramatiką išsaugotomis (sukauptomis) raidžių, 
+specialių simbolių ir skaitmenų simbolių grupėmis (reiškiniais), kurie 
+daugiausia pasikartoja tarp išanalizuotų slaptažodžių, galime gauti slaptažodį 
+\textquote{App!*33}, kurio pradinė ašies reikšmė yra lygi nuliui. Parenkant 
+pradines reikšmes pirminiams slaptažodžiams, pirmenybė skiriama reikšmėms su 
+aukščiausia tikimybe (t.y. dažniausiai pasikartojo išanalizuotuose 
+slaptažodžiuose). Atsižvelgiant į šio pradinio slaptažodžio ašies reikšmę (kuri 
+yra lygi nuliui), galima atlikti tris transformacijas -- pakeisti grupes 
+\textquote{A3}, \textquote{S2} ir \textquote{D2}, t.y. pakeisti kiekvieną 
+simbolių grupę arba reiškinį vieną kartą, sugeneruojant 3 naujas šio 
+slaptažodžio variacijas, po vieną kiekvienai transformacijai. Pakeitus grupę 
+\textquote{A3}, ašies reikšmę -- nulį -- pakeičiame grupės indeksu -- nuliu 
+(kadangi indeksą skaičiuojame nuo nulio), ir tai atlikus kitoms grupėms 
+atitinkamai gauname jų ašies indeksus 1 ir 2. Taikant skyriuje \ref{sec:pcfgalg} 
+pateiktas slaptažodžių transformavimo taisykles, atsižvelgiant į naujai 
+sugeneruotų (transformuotų) 3 slaptažodžių ašies indeksus -- 0, 1 ir 2 -- galima 
+toliau atlikti tokias transformacijas, kai šie minėti trys transformuoti 
+slaptažodžiai bus išvesti:
+\begin{itemize}
+  \item iš pirmo transformuoto slaptažodžio, kurio ašies indeksas yra lygus 
+    nuliui, išvesti 3 naujus transformuotus slaptažodžius, pakeitus 1-3 grupes;
+  \item iš antro transformuoto slaptažodžio, kurio ašies indeksas yra lygus 
+    vienam, išvesti 2 naujus transformuotus slaptažodžius, pakeitus 2-3 grupes;
+  \item iš trečio transformuoto slaptažodžio, kurio ašies indeksas yra lygus 
+    dviem, išvesti 1 naują transformuotą slaptažodį, pakeitus 3 grupę.
+\end{itemize}
+
+Grupių (reiškinių) pakeitimai yra atliekami tol, kol transformacijų ašies 
+reikšmė nepasiekia paskutinės grupės, arba nepasibaigia simbolių grupės 
+(reiškiniai), su kuriais būtų galima atlikti šiuos pakeitimus, žr. 
+\ref{plot:pcfgtransforms} pav.
+
+\begin{figure}
+  \begin{tikzpicture}[
+    sibling distance=12em,
+    every node/.style = {
+      shape=rectangle,
+      sharp corners,
+      align=center
+    }
+  ]
+    \node { App!*33 \\ $p=0$ }
+      % Replace first group
+      child { node { dSA!*33 \\ $p=0$ }
+        child { node { \ldots \\ $p=0$ } }
+        child { node { \ldots \\ $p=1$ } }
+        child { node { \ldots \\ $p=2$ } }
+      }
+      % Replace second group
+      child { node { App@@33 \\ $p=1$ }
+        child { node { \ldots \\ $p=1$ } }
+        child { node { \ldots \\ $p=2$ } }
+      }
+      % Replace third group
+      child { node { App!*47 \\ $p=2$ }
+        child { node { \ldots \\ $p=2$ } }
+      };
+  \end{tikzpicture}
+  \caption{
+    Slaptažodžio \textquote{App!*33}, kurio gramatika \textquote{A3S2D2},
+    transformacijų medis.
+  }
+  \label{plot:pcfgtransforms}
+\end{figure}
 
 \subsubsubsection{Pastebėjimai}
 Algoritmas pabaigą pasiekia tada, kai gramatikos arba unikalios simbolių grupės 
@@ -527,13 +729,6 @@ apmokymui pateiktų slaptažodžių aibėje -- naujų gramatikų ir slaptažodž
 nėra.
 Kadangi \textquote{PCFG} algoritmas yra pagrįstas statistinėmis tikimybėmis, 
 reikalauja daug skaičiavimų.
-
-% TODO Giliau panagrineti problema, duoti konkreciu pavyzdziu pvz is Passware, 
-% sifruota particija su LUKS
-
-% Naudoti kita PCFG implementacija, o ne mano, geresni skaiciai gausis tada
-% galima rasyti, kad tipo realizacija paremta pagal tokie ir toki projekta,
-% det isnasa i konkrecia nuoroda
 
 \section{Pagrindinė tiriamoji dalis}
 \subsection{Etika}
@@ -553,15 +748,25 @@ informacija yra nepateikta.
 
 \subsection{Nutekintų slaptažodžių duomenų bazių analizė} \label{sec:db-analize}
 Šiame darbe naudojamos dvi nutekintų slaptažodžių duomenų bazės, atvirai 
-prieinamos viešais šaltiniais -- \textquote{RockYou} ir \textquote{myspace}. 
+prieinamos viešais šaltiniais -- \textquote{RockYou} ir \textquote{Linkedin}. 
 Dešimt dažniausiai pasikartojančių slaptažodžių duomenų bazėje 
 \textquote{RockYou} yra pateikti \ref{tab:rockyou10} lentelėje, o duomenų bazėje 
-\textquote{myspace} -- \ref{tab:myspace10} lentelėje.
+\textquote{Linkedin} -- \ref{tab:linkedin10} lentelėje. Turimą 
+\textquote{RockYou} nutekintą slaptažodžių duomenų bazę sudaro iš viso 
+$32603388$ įrašai, iš kurių $14283864$ ($43.81 \%$ visų įrašų) slaptažodžiai yra 
+unikalūs. Turimą \textquote{Linkedin} nutakintą slaptažodžių duomenų bazę sudaro 
+iš viso $8616484$ įrašai, iš kurių $4878546$ ($56.61 \%$ visų įrašų) yra 
+unikalūs ir su \textquote{RockYou} įrašais sutampa $664704$ (iš viso $2.04 \%$ 
+visų \textquote{RockYou} irašų).
 
 % If unsorted and unnumbered, use command:
 % $ sort DB.txt | uniq -c | sort -nr | head -n 10
 \begin{table}[hb]
   \centering
+  \caption{
+    Duomenų rinkinio \textquote{RockYou} 10 dažniausiai pasikartojančių 
+    slaptažodžių.
+  }
   \begin{tabular}{|c|c|}
     \hline \textbf{Kiekis} & \textbf{Slaptažodis} \\
     \hline 290729 & 123456 \\
@@ -576,10 +781,6 @@ Dešimt dažniausiai pasikartojančių slaptažodžių duomenų bazėje
     \hline 16648 & abc123 \\
     \hline
   \end{tabular}
-  \caption{
-    Duomenų rinkinio \textquote{RockYou} 10 dažniausiai pasikartojančių 
-    slaptažodžių.
-  }
   \label{tab:rockyou10}
 \end{table}
 
@@ -588,6 +789,10 @@ bendrinių daiktavardžių, paprastų skaičių ir raidžių sekų.
 
 \begin{table}[ht]
   \centering
+  \caption{
+    Duomenų rinkinio \textquote{Linkedin} 10 dažniausiai pasikartojančių 
+    slaptažodžių.
+  }
   \begin{tabular}{|c|c|}
     \hline \textbf{Kiekis} & \textbf{Slaptažodis} \\
     \hline 75 & password1 \\
@@ -602,14 +807,10 @@ bendrinių daiktavardžių, paprastų skaičių ir raidžių sekų.
     \hline 17 & nicole1 \\
     \hline
   \end{tabular}
-  \caption{
-    Duomenų rinkinio \textquote{myspace} 10 dažniausiai pasikartojančių 
-    slaptažodžių.
-  }
-  \label{tab:myspace10}
+  \label{tab:linkedin10}
 \end{table}
 
-\ref{tab:rockyou10}, \ref{tab:myspace10} lentelėse pateikti dažniausi vartotojų 
+\ref{tab:rockyou10}, \ref{tab:linkedin10} lentelėse pateikti dažniausi vartotojų 
 slaptažodžiai yra daugiausia sudaryti iš lotyniškos abėcėlės raidžių bei 
 skaitmenų.
 
@@ -664,45 +865,261 @@ skaitmenų.
 \end{figure}
 
 Toliau atlikta nutekintų slaptažodžių duomenų bazių įrašų ilgių analizė, žr. 
-\ref{plot:rockyoulength,plot:myspacelength} pav., parodo, kad daugiausia 
+\ref{plot:rockyoulength}, \ref{plot:myspacelength} pav., parodo, kad daugiausia 
 vartotojų sukurtų slaptažodžių yra tarp 5-10 simbolių ilgio (slaptažodžiai, 
-ilgesni nei 32 simboliai, buvo atmesti žemiau pateiktuose vizualizacijose).
+ilgesni nei 32 simboliai, buvo atmesti pateiktuose vizualizacijose).
 
 \subsection{Eksperimentuose taikoma strategija} \label{sec:strategy}
-Su pasirinktu automatizuoto slaptažodžių parinkimo metodu bus apmokytas modelis 
-su 80 \% duomenų nuo visos pasirinktos nutekintos slaptažodžių duomenų bazės 
-įrašų aibės, likusieji 20 \% bus naudojami testavimui. Nutekintoms slaptažodžių 
-duomenų bazėms, kurios minėtos ir analizuotos \ref{sec:db-analize} skyriuje, bus 
-naudojamos modelių apmokymui. Siekiant įvertinti automatizuoto slaptažodžio 
-parinkimo metodo efektyvumą, bus generuojami tarp $10^{4}$ ir $10^{10}$ 
-slaptažodžių, kurie bus testuojami su 20 \% įrašų iš apmokymui naudojamos 
-duomenų bazės testavimo duomenų aibės, ir su kita, anksčiau modelio nematyta 
-nutekinta slaptažodžių duomenų baze. Generuojant mažiau, nei $10^{4}$ 
+Su pasirinktu automatizuoto slaptažodžių parinkimo metodu ir naudojant jo 
+realizacijos moksliniame straipsnyje apibrėžtus rekomenduojamus parametrus bus 
+apmokytas modelis su 80 \% duomenų nuo visos pasirinktos nutekintos slaptažodžių 
+duomenų bazės įrašų aibės, likusieji 20 \% bus naudojami testavimui. Nutekintoms 
+slaptažodžių duomenų bazėms, kurios minėtos ir analizuotos \ref{sec:db-analize} 
+skyriuje, bus naudojamos modelių apmokymui. Siekiant įvertinti automatizuoto 
+slaptažodžio parinkimo metodo efektyvumą, bus generuojami tarp $10^{4}$ ir 
+$10^{10}$ slaptažodžių, kurie bus testuojami su 20 \% įrašų iš apmokymui 
+naudojamos duomenų bazės testavimo duomenų aibės, ir su kita, anksčiau modelio 
+nematyta nutekinta slaptažodžių duomenų baze. Generuojant mažiau, nei $10^{4}$ 
 slaptažodžių, \textquote{PassGAN} metodas nesugeneravo slaptžodžių, o 
-\textquote{PCFG} -- turėjo mažesnį, nei 1 \% tikslumą. Slaptažodžių, sutampančių 
-su 20 \% testavimo duomenų aibės slaptažodžiais ir su kitoje nutekintoje duomenų 
-bazėje esančiais slaptažodžiais, kiekis bus fiksuojamas kiekvienam sugeneruotų 
-slaptažodžių rinkiniui.
+\textquote{PCFG} -- turėjo mažesnį, nei 1 \% tikslumą, dėl to nebus lyginami 
+mažesni, nei $10^{4}$, slaptažodžių sąrašai. Modelio apmokymas vyks su 
+\textquote{RockYou} nutekinta slaptažodžių duomenų baze dėl joje esančių didelių 
+slaptažodžių kiekių, palyginus su \textquote{myspace} nutekinta slaptažodžių 
+duomenų baze.
+
+Testavimas bus atliktas palyginant sugeneruotą slaptažodžių sąrašą su testavimo 
+duomenų aibe \textquote{Linux} pagrindo operacinės sistemos programų paketo 
+\textquote{Coreutils - GNU core utilities} įrankių \textquote{sort}, 
+\textquote{comm}, \textquote{split}, \textquote{wc} pagalba \cite{Coreutils}. 
+Sugeneruotas slaptažodžių sąrašas bus išrykiuotas, tarp sugeneruotos ir 
+testavimo duomenų aibių bus išskirti bendri įrašai, suskaičiuotas įrašų skaičius 
+ir paskaičiuota, kokią dalį sudaro bendrų įrašų skaičius testavimo duomenų 
+aibės.
+
+Slaptažodžių, sutampančių su 20 \% testavimo duomenų aibės slaptažodžiais ir su 
+kitoje nutekintoje duomenų bazėje esančiais slaptažodžiais, kiekis bus 
+fiksuojamas kiekvienam sugeneruotų slaptažodžių rinkiniui.
 
 \subsection{\textquote{PassGAN} eksperimentų serija}
-Šioje dalyje atliekami eksperimentai su \textquote{PassGAN} metodo 
-realizacija\footnotemark, generuojant slaptažodžių sąrašus pagal 
-\ref{sec:strategy} skyriuje aprašyta strategija.
+Šioje dalyje atliekami eksperimentai su \textquote{PassGAN} metodo realizacija 
+\cite{PassGAN:impl}, generuojant slaptažodžių sąrašus pagal \ref{sec:strategy} 
+skyriuje aprašyta strategija. Apmokytas modelis su 80 \% \textquote{RockYou} 
+duomenų rinkiniu, ir, testuojant su 20 \% to paties duomenų rinkinio testavimo 
+duomenų aibe, rezultatai pateikti \ref{tab:passganrockyouresults} lent., kurioje 
+matyti panašūs rezultatai į \textquote{PassGAN} metodo mokslinio straipsnio 
+autoriaus rezultatus, pateiktus \ref{tab:passganoriginalresults} lent.
 
-\footnotetext{
-  Realizacija yra paremta internetinėje svetainėje 
-  \url{https://github.com/d4ichi/PassGAN} patalpinto projekto pagrindu.
-}
+\begin{table}[hb]
+  \centering
+  \caption{
+    Slaptažodžių, sugeneruotų \textquote{PassGAN} metodu, apmokytų 80 \% 
+    \textquote{RockYou} duomenų ir sutampančių su \textquote{RockYou} testavimo 
+    duomenų aibe.
+  }
+  \begin{tabular}{|c|c|c|}
+    \hline \textbf{Slaptažodžių kiekis} & \textbf{Unikalūs slaptažodžiai} & 
+    \textbf{Sutampančių slaptažodžių kiekis} \\
+    \hline $10^4$ & 9040 & $0.028584$ \% \\
+    \hline $10^5$ & 95295 & $0.254988$ \% \\
+    \hline $10^6$ & 885174 & $1.505298$\% \\
+    \hline $10^7$ & 7489667 & $5.285309$ \% \\
+    \hline $10^8$ & 57162878 & $12.358798$ \% \\
+    \hline $10^9$ & 390305149 & $21.805633$ \% \\
+    \hline $10^{10}$ & 2379342789 & $32.126489$ \% \\
+    \hline
+  \end{tabular}
+  \label{tab:passganrockyouresults}
+\end{table}
 
+Atlikus analizę \textquote{PassGAN} metodu sugeneruotų slaptažodžių dublikatų 
+kiekio, rezultatai pateikti \ref{plot:passganrockyouresults} pav., kuriose taip 
+pat matyti panašūs dublikuotų slaptažodžių kiekiai, kaip pateikta 
+\ref{plot:passganoriginalresults} pav.
+
+\begin{figure}[!ht]
+  \begin{center}
+    \begin{tikzpicture}
+      \begin{axis}[
+        ybar,
+        xlabel={Sugeneruoti slaptažodžiai},
+        ylabel={Unikalūs slaptažodžiai},
+        x unit={vnt.},
+        y unit={\%},
+        ymin=0,
+        ymax=100,
+        xticklabels={,,$10^4$,$10^5$,$10^6$,$10^7$,$10^8$,$10^9$,$10^{10}$},
+        grid=major,
+        grid style={dashed,gray!30},
+        width=10cm,
+        height=7cm,
+      ]
+      \addplot coordinates {
+        (1, 97.38)
+        (2, 94.4)
+        (3, 85.5972)
+        (4, 70.64483)
+        (5, 52.815412)
+        (6, 35.621683)
+        (7, 23.793428)
+      };
+      \end{axis}
+    \end{tikzpicture}
+  \end{center}
+  \caption{
+    Unikalių slaptažodžių, sugeneruotų \textquote{PassGAN} metodu, kiekis.
+  }
+  \label{plot:passganrockyouresults}
+\end{figure}
+
+Palyginus \ref{tab:passganrockyouresults} lent. ir 
+\ref{plot:passganrockyouresults} pav. pateiktus rezultatus, kurie yra panašūs į 
+\textquote{PassGAN} mokslinio straipsnio rezultatus, atliktas palyginimas su 
+\textquote{PassGAN} mokslinio straipsnio autoriaus gautais rezultatais su tą 
+pačia nutekinta slaptažodžių duomenų baze -- \textquote{RockYou} (80 \% 
+slaptažodžių modelio apmokymui, likusieji 20 \% testavimui) -- kurio rezultatai 
+pateikti \ref{plot:passgancomparison} pav.
+
+\begin{figure}[!ht]
+  \begin{center}
+    \begin{tikzpicture}
+      \begin{axis}[
+        xlabel={Sugeneruoti slaptažodžiai},
+        ylabel={Sutampantys slaptažodžiai},
+        x unit={vnt.},
+        y unit={\%},
+        ymin=0,
+        ymax=100,
+        xticklabels={,,$10^4$,$10^5$,$10^6$,$10^7$,$10^8$,$10^9$,$10^{10}$},
+        grid=major,
+        grid style={dashed,gray!30},
+        width=10cm,
+        height=7cm,
+        legend style={at={(0.5,-0.25)}, anchor=north}
+      ]
+      \addplot coordinates {
+        (1, 0.028584)
+        (2, 0.254988)
+        (3, 1.505298)
+        (4, 5.285309)
+        (5, 12.358798)
+        (6, 21.805633)
+        (7, 32.126489)
+      };
+      \addplot coordinates {
+        (1, 0.005)
+        (2, 0.048)
+        (3, 0.381)
+        (4, 2.038)
+        (5, 6.726)
+        (6, 15.094)
+        (7, 26.036)
+      };
+      \legend{
+        Šio darbo skelbiami rezultatai,
+        Moksliniame straipsnyje skelbiami rezultatai
+      }
+      \end{axis}
+    \end{tikzpicture}
+  \end{center}
+  \caption{
+    Sutampančių su 20 \% \textquote{RockYou} duomenų rinkinio testavimo aibe 
+    slaptažodžių dalis, palyginus su \textquote{PassGAN} mokslinio straipsnio 
+    autoriaus rezultatais.
+  }
+  \label{plot:passgancomparison}
+\end{figure}
+
+Įvertinus \ref{plot:passgancomparison} pav. pateiktą informaciją, nustatyta, kad 
+iki $10^7$ sugeneruotų slaptažodžių, slaptažodžių kiekis, sutampantis su 
+testavimo duomenų aibe, sutampa (tarp 1-2 \%), o didesniems generuojamų 
+slaptažodžių kiekiams -- šiame darbe apmokytu modeliu maždaug 4-6 \% daugiau 
+slaptažodžių parenka. Toks slaptažodžių parinkimo tikslumo pakilimas yra 
+priskiriamas nutekintos slaptažodžių duomenų bazės \textquote{RockYou} 
+išmaišymui prieš padalinant į apmokymo ir testavimo aibes. Slaptažodžiai, su 
+kuriais buvo testuojamas modelis aukščiau minėtame straipsnyje, galimai pateko į 
+apmokymo duomenų aibę šiame darbe, todėl parinkimo tikslumas neryškiai skiriasi.
+
+Toliau, patikrinus sugeneruotus $10^4$-$10^{10}$ slaptažodžių sąrašus su 
+\textquote{Linkedin} testavimo duomenų rinkiniu, buvo atlikta analogiška 
+rezultatų analizė, kaip aukščiau, ir analizės rezultatai pateikti -- sutampančių 
+slaptažodžių kiekis procentais \ref{tab:passganlinkedinresults} lent.
+
+\begin{table}[hb]
+  \centering
+  \caption{
+    Slaptažodžių, sugeneruotų \textquote{PassGAN} metodu, apmokytų 80 \% 
+    \textquote{RockYou} duomenų ir sutampančių su \textquote{Linkedin} testavimo 
+    duomenų aibe.
+  }
+  \begin{tabular}{|c|c|c|}
+    \hline \textbf{Slaptažodžių kiekis} & \textbf{Unikalūs slaptažodžiai} & 
+    \textbf{Sutampančių slaptažodžių kiekis} \\
+    \hline $10^4$ & 9040 & $0.011684$ \% \\
+    \hline $10^5$ & 95295 & $0.103781$ \% \\
+    \hline $10^6$ & 885174 & $0.608665$ \% \\
+    \hline $10^7$ & 7489667 & $2.233555$ \% \\
+    \hline $10^8$ & 57162878 & $5.586419$ \% \\
+    \hline $10^9$ & 390305149 & $10.574647$ \% \\
+    \hline $10^{10}$ & 2379342789 & $16.681897$ \% \\
+    \hline
+  \end{tabular}
+  \label{tab:passganlinkedinresults}
+\end{table}
+
+\begin{figure}[!ht]
+  \begin{center}
+    \begin{tikzpicture}
+      \begin{axis}[
+        xlabel={Sugeneruoti slaptažodžiai},
+        ylabel={Sutampantys slaptažodžiai},
+        x unit={vnt.},
+        y unit={\%},
+        ymin=0,
+        ymax=100,
+        xticklabels={,,$10^4$,$10^5$,$10^6$,$10^7$,$10^8$,$10^9$,$10^{10}$},
+        grid=major,
+        grid style={dashed,gray!30},
+        width=10cm,
+        height=7cm,
+        legend style={at={(0.5,-0.25)}, anchor=north}
+      ]
+      \addplot coordinates {
+        (1, 0.011684)
+        (2, 0.103781)
+        (3, 0.608665)
+        (4, 2.233555)
+        (5, 5.586419)
+        (6, 10.574647)
+        (7, 16.681897)
+      };
+      % SITUS REIKIA PAKEISTI
+      \addplot coordinates {
+        (1, 0.005)
+        (2, 0.048)
+        (3, 0.381)
+        (4, 2.038)
+        (5, 6.726)
+        (6, 15.094)
+        (7, 26.036)
+      };
+      \legend{
+        Šio darbo skelbiami rezultatai,
+        Moksliniame straipsnyje skelbiami rezultatai
+      }
+      \end{axis}
+    \end{tikzpicture}
+  \end{center}
+  \caption{
+    Sutampančių su 20 \% \textquote{RockYou} duomenų rinkinio testavimo aibe 
+    slaptažodžių dalis, palyginus su \textquote{PassGAN} mokslinio straipsnio 
+    autoriaus rezultatais.
+  }
+  \label{plot:passgancomparison}
+\end{figure}
 \subsection{\textquote{PCFG} eksperimentų serija}
-Šioje dalyje atliekami eksperimentai su \textquote{PCFG} metodo 
-realizacija\footnotemark, generuojant slaptažodžių sąrašus pagal 
-\ref{sec:strategy} skyriuje aprašyta strategija.
-
-\footnotetext{
-  Realizacija yra paremta internetinėje svetainėje 
-  \url{https://github.com/lakiw/pcfg_cracker} patalpinto projekto pagrindu.
-}
+Šioje dalyje atliekami eksperimentai su \textquote{PCFG} metodo realizacija 
+\cite{PCFG:impl}, generuojant slaptažodžių sąrašus pagal \ref{sec:strategy} 
+skyriuje aprašyta strategija.
 
 \begin{figure}[!ht]
   \begin{center}
