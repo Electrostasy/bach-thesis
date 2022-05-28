@@ -7,16 +7,17 @@
 \usepackage{amsmath}
 \usepackage{bm}
 \usepackage{caption}
+\usepackage{subcaption}
 \usepackage{color}
 \usepackage{float}
 \usepackage{graphicx}
-\usepackage{subfig}
 \usepackage{url}
 \usepackage{wrapfig}
 
 % Plotting
 \usepackage{siunitx}
 \usepackage{tikz}
+\usetikzlibrary{positioning}
 \usepackage{pgfplots}
 \pgfplotsset{compat=newest}
 \usepgfplotslibrary{units}
@@ -37,7 +38,7 @@
 \status{4 kurso 1 grupės studentas}
 \author{Gediminas Valys}
 \supervisor{prof. dr. Igoris Belovas}
-\reviewer{doc. dr. Vardauskas Pavardauskas}
+\reviewer{jaunesn. asist. Andrius Chaževskas}
 \date{Vilnius \\ 2022}
 
 \setmainfont{Palemonas}
@@ -48,16 +49,54 @@
 
 \tableofcontents
 
-\sectionnonum{Sąvokų apibrėžimai}
-Sutartinių ženklų, simbolių, vienetų ir terminų sutrumpinimų sąrašas (jeigu
-ženklų, simbolių, vienetų ir terminų bendras skaičius didesnis nei 10 ir
-kiekvienas iš jų tekste kartojasi daugiau nei 3 kartus).
+% \sectionnonum{Sąvokų apibrėžimai}
+% Sutartinių ženklų, simbolių, vienetų ir terminų sutrumpinimų sąrašas (jeigu
+% ženklų, simbolių, vienetų ir terminų bendras skaičius didesnis nei 10 ir
+% kiekvienas iš jų tekste kartojasi daugiau nei 3 kartus).
 
 \section{Santrauka}
-Santrauka lietuviškai.
+Šiame darbe palyginami du vieni iš naujausių automatizuoto slaptažodžių 
+parinkimo metodai, kurių paskirtis -- parinkti (atspėti) tikrus vartotojų 
+slaptažodžius nežinant jų tikros reikšmės. Šie metodai gali būti pritaikyti 
+atliekant baudžiamųjų bylų skaitmeninės informacijos ekspertinius tyrimus, 
+siekiant nustatyti kaltę: prisijungimo duomenų nustatymas, šifruotos duomenų 
+laikmenos iššifravimo (apsaugos) slaptažodžio nustatymas (atkūrimas), kt. 
+apsaugos kodų, sukurtų žmogaus, nustatymas. Internetinių paslaugų, kompiuterių 
+ir mobiliųjų įrenginių vartotojai dažnai renkasi apsaugoti savo paskyras ir 
+duomenis įsimintinais slaptažodžiais, ir dažnai naudoja tuos pačius ne vieną 
+kartą. Iki šiol nutekinti ir paviešinti internetinių paslaugų vartotojų paskyrų 
+duomenys internete taip pat galima rasti viešai prieinamose nutekintose 
+slaptažodžių duomenų bazėse. Šiuose duomenyse yra daugybė informacijos apie 
+vartotojų slaptažodžių kūrimo metodikas ir įpročius, tame tarpe ir kokie 
+slaptažodžiai yra dažniausiai pasikartojantys. Dabartiniai slaptažodžių puolimo 
+metodai ilgesnių nei 6 simbolių slaptažodžių su dabartinėmis technologinėmis 
+galimybėmis parinkti negali arba yra labai apriboti, todėl šiuo darbu siekiama 
+įvertinti kitus būdus, taikant šiuos naujausius slaptažodžių parinkimo metodus 
+ir viešai prieinamus duomenis -- nutekintas slaptažodžių duomenų bazes. 
+Atliekant eksperimentus su dviejomis tokiomis nutekintomis slaptažodžių duomenų 
+bazėmis nusimato, kad pritaikyti slaptažodžių parinkimo metodai turi potencialo 
+parinkti ilgesnius, sudėtingesnius, anksčiau nematytus slaptažodžius.
 
 \section{Summary}
-Summary in English.
+This work compares two of the latest automated password guessing techniques that 
+are intended for guessing real user passwords without prior knowledge of them. 
+These methods can be applied in practice during criminal proceedings and digital 
+information forensic examinations to determine login credentials, decryption 
+passwords of encrypted storage devices, protected mobile devices and other 
+man-made passcodes. Many users of Internet services, computer and mobile device 
+owners tend to use memorable passwords to protect their accounts and data, and 
+they tend to reuse their passwords. Many times there have been online services 
+data breaches, where the user accounts data was dumped online and can now be 
+commonly located in publicly available leaked password lists -- these lists 
+contain much information with regards to how users choose to create their 
+passwords, their password creation habits. Current methods for guessing a user's 
+password, if it is longer than 6 characters, can be cumbersome and limited
+by both data storage and computing utilization, and it is my intention to 
+evaluate different approaches by applying the latest automated password guessing 
+techniques and using publicly available data -- leaked password lists. By 
+comparing these password guessing methods in a series of experiments with leaked 
+password lists, their potential for guessing previously unseen passwords longer 
+than 6 characters in length will be considered and evaluated.
 
 \section{Įvadas}
 % Autentifikacija slaptažodžiu
@@ -65,38 +104,37 @@ Vartotojo autentikacija slaptažodžiu yra vienas iš pagrindinių kibernetinio
 saugumo metodų.
 % Kodėl yra poreikis slaptažodį nustatyti
 Baudžiamųjų bylų tyrimuose, siekiant nustatyti kaltę, skaitmeninės informacijos 
-specialistams užduodamos užduotys nuskaityti kaltinamojo kompiuterių, mobiliųjų 
-įrenginių informaciją ir atlikti informacijos analizę, atsakyti į užduotyje 
-pateiktus klausimus -- jei įrenginys apsaugotas skaitmeninės informacijos 
-šifravimo priemonėmis, taip pat svarbu nustatyti 
+specialistams (teismo ekspertams) užduodamos užduotys nuskaityti kaltinamojo 
+kompiuterių, mobiliųjų įrenginių informaciją ir atlikti informacijos analizę, 
+atsakant į užduotyje pateiktus klausimus -- jei įrenginys apsaugotas 
+skaitmeninės informacijos šifravimo priemonėmis, taip pat svarbu nustatyti 
 prisijungimo/apsaugos/iššifravimo slaptažodį -- kitaip informacijos analizės 
 atlikti nėra galimybės.
 % Plačiau apie probleminę sritį
-Tokiose atvejuose, kai reika iššifruoti skaitmeninę informacijos laikmeną arba 
-prisijungti prie vartotojo internetinės paskyros nežinant apsaugos slaptažodį, 
-naudojami slaptažodžių parinkimo metodai nustatyti apsaugos/prisijungimo 
-slaptažodį -- atspėjimas brutalios jėgos būdu, naudojant įvairias nutekintas 
-slaptažodžių duomenų bazes. Aukščiau minėti metodai yra ribotų galimybių -- 
-brutalios jėgos būdu ilgesnius nei 6 simbolių ilgio slaptažodžius nustatyti 
-praktiškai neįmanoma dėl eksponentiškai išaugusio sudėtingumo ir duomenų kiekių, 
-o slaptažodžių sąrašuose tikimybė, kad yra ieškomas slaptažodis, maža.
+Tokiose atvejuose, kai reikia iššifruoti skaitmeninę informacijos laikmeną arba 
+prisijungti prie vartotojo internetinės paskyros nežinant apsaugos slaptažodio, 
+naudojami įvairūs slaptažodžių parinkimo metodai, kuriais siekiama nustatyti 
+apsaugos/prisijungimo slaptažodį. Šiomis dienomis naudojami metodai yra ribotų 
+galimybių, pvz. brutalios jėgos būdu ilgesnius nei 6 simbolių ilgio 
+slaptažodžius nustatyti praktiškai neįmanoma dėl eksponentiškai išaugusio 
+slaptažodžių parinkimo užduoties sudėtingumo bei duomenų kiekių, o slaptažodžių 
+sąrašuose tikimybė, kad yra ieškomas slaptažodis, maža.
 % Tikslas - palyginti du naujausius automatizuoto slaptažodžio parinkimo 
 % metodus, kurie gali ir sudėtingesnius slaptažodžius lengvai parinkti
 Naujausi automatizuoto slaptažodžių parinkimo metodai, pagrįsti mašininio 
 mokymosi ir statistiniais metodais, turi potencialo parinkti ir ilgesnius, nei 6 
 simbolių ilgio, slaptažodžius, kurių esamuose slaptažodžių sąrašuose nėra -- šie 
 metodai galėtų žymiai palengvinti ir supaprastinti slaptažodžio parinkimo 
-užduotis. Šio darbo tikslas yra palyginti tokius metodus, įvertinant jų 
-efektyvumą, privalumus ir trūkumus.
+užduotis ir padėti baudžiamųjų bylų tyrimuose iššifruojant šifruotas duomenų 
+laikmenas, atliekant informacijos analizę. Šio darbo tikslas yra palyginti 
+tokius metodus, įvertinant jų efektyvumą, privalumus ir trūkumus.
 % Kaip aš tai atliksiu - įvardinti uždavinius, tyrimo metodologija
 Iškelto tikslo pasiekimui šiame darbe bus atliekami eksperimentai su aukščiau 
-minėtais slaptažodžių parinkimo metodais, kuriose siekiama parinkti kuo didesnį 
-kiekį iš anksto nežinomų slaptažodžių nutekintuose slaptažodžių duomenų bazėse. 
-Apmokius slaptažodžių parinkimo modelį su pasirinktomis atvirai prieinamomis 
-nutekintomis slaptažodžių duomenų bazėmis bus fiksuojamas parinktų slaptažodžių, 
-persidengiančių su nežinomų (ieškomų) slaptažodžių aibe, kiekis. Išbandžius 
-skirtingus modelio apmokymo slaptažodžių duomenų bazes, užfiksavus ir įvertinus 
-pasiektus rezultatus, vedamos išvados.
+minėtais naujausiais slaptažodžių parinkimo metodais, kuriose siekiama parinkti 
+kuo didesnį kiekį iš anksto nežinomų slaptažodžių nutekintuose slaptažodžių 
+duomenų bazėse. Apmokius slaptažodžių parinkimo modelį su pasirinktomis atvirai 
+prieinamomis nutekintomis slaptažodžių duomenų bazėmis bus fiksuojamas parinktų 
+slaptažodžių, persidengiančių su nežinomų (ieškomų) slaptažodžių aibe, kiekis.
 
 \section{Literatūros apžvalga}
 \subsection{Pagrindinės idėjos}
@@ -105,34 +143,32 @@ konteksto probleminei sričiai ir kuriomis vadovaujantis veikia slaptažodžio
 parinkimo metodai. Kiekvienas nagrinėjamas automatizuotas slaptažodžio parinkimo 
 metodas yra pagrįstas bendresnių mokslinių, technologinių pažengimų, ir yra 
 konkretus jų pritaikymas slaptažodžio parinkimo problemos sprendimui, dėl to 
-metodo veikimo principo apžvalgai yra reikalingos žemiau minimos pagrindinės 
-mintys.
+metodo veikimo principo apžvalgai yra reikalingos žemiau minimi procesai ir 
+sprendimai.
 
 \subsubsection{Slaptažodžių parinkimo procesas} \label{sec:cracking}
 Slaptažodžių parinkimas šnekamojoje kalboje taip pat vadinamas 
 \textquote{slaptažodžių laužymu} -- procesas, kai turimą nežinomo slaptažodžio 
 kontrolinę sumą yra bandoma atspėti parenkant tikrąjį, maišos funkcijos 
 neapdorotą slaptažodį. Turint slaptažodį, kurį norima patikrinti, slaptažodis 
-yra apdorojimas kriptografine maišos funkcija ir palyginama išvesta kontrolinė 
+yra apdorojamas kriptografine maišos funkcija ir palyginama išvesta kontrolinė 
 suma su turima kontroline suma -- jei kontrolinės sumos sutampa, slaptažodis 
 buvo atspėtas/parinktas (\textquote{nulaužtas}).
 
 \subsubsection{Maišos funkcija ir kontrolinė suma} \label{sec:hashing}
 Kaip minėta \ref{sec:cracking} skyriuje, slaptažodžio parinkime paprastai turime 
-kokio nors slaptažodžio kontrolinę sumą, sukurtą kriptografinės maišos 
-funkcijos, kurios tikrąją vertę nežinome, bet galime atspėti.
-
-Slaptažodžių parinkimui bei saugojimui yra taikomos kriptografinėmis maišos 
-funkcijos (angl. \textquote{Hash Function}) dėl jų išvesties savybių. Maišos 
-funkcija yra kriptografijoje naudojamas skaičiavimas (algoritmas), kuris iš tam 
-tikros įvesties grąžina unikalę išvestį,
-vadinamą kontroline suma (angl. \textquote{Hash}). Kontrolinė suma dalinai arba 
-pilnai pasikeičia atspindint menkiausią pasikeitimą įvesties duomenyse, pvz. 
-maišos funkcija \textquote{MD5} (angl. \textquote{Message Digest Algorithm 5}) 
-įvestiems duomenims \textquote{duomenys} grąžina išvestį 
-\textquote{df4111da0615399abad70223d1d74b9b}; pakeitus įvesties duomenų vieną 
-simbolį -- įvesties duomenys dabar yra \textquote{duomenis} -- atitinkama 
-\textquote{MD5} maišos funkcijos kontrolinė suma bus 
+kokio nors slaptažodžio kontrolinę sumą, kriptografinės maišos funkcijos 
+išvestį, kurios tikrąją vertę nežinome, bet galime atspėti. Slaptažodžių 
+parinkimui bei saugojimui yra taikomos kriptografinėmis maišos funkcijos (angl. 
+\textquote{Hash Function}) dėl jų išvesties savybių. Maišos funkcija yra 
+kriptografijoje naudojama veiksmų seka, algoritmas, kuris iš tam tikros įvesties 
+grąžina unikalę išvestį, vadinamą kontroline suma (angl. \textquote{Hash}). 
+Kontrolinė suma dalinai arba pilnai pasikeičia atspindint menkiausią pasikeitimą 
+įvesties duomenyse, pvz. maišos funkcija \textquote{MD5} (angl. 
+\textquote{Message Digest Algorithm 5}) įvestiems duomenims \textquote{duomenys} 
+grąžina išvestį \textquote{df4111da0615399abad70223d1d74b9b}; pakeitus įvesties 
+duomenų vieną simbolį -- įvesties duomenys dabar yra \textquote{duomenis} -- 
+atitinkama \textquote{MD5} maišos funkcijos kontrolinė suma bus 
 \textquote{a9d5bc509e33c1d98dca1ba876c9045b}.
 
 Iš kontrolinės sumos įvesties duomenų atkurti paprastai neįmanoma, tačiau tarp 
@@ -152,42 +188,45 @@ kontrolinė suma -- $\frac{1}{2^{128}}$. Praktikoje jau buvo rastos kolizijos su
 \textquote{MD5} algoritmu, taikant įvairias atakas ir metodus nustatyti 
 kolizijas trumpiau nei per sekundę \cite{BreakMD5,MD5Attacks}.
 
-Maišos funkcijos yra naudojamos suskaičiuoti slaptažodžių kontrolines sumas -- 
-dažnai prie slaptažodžių pridedama papildoma informacija, kuri gali būti saugoma 
-duomenų bazėse arba šifruotų laikmenų antraštėse. Prieš skaičiuojant 
-slaptažodžio kontrolinę sumą, gera praktika yra prie slaptažodžio pridėti 
-papildomą informaciją, kaip pvz. vadinamoji \textquote{druska} (angl. 
+Maišos funkcijos praktikoje yra naudojamos suskaičiuoti slaptažodžių kontrolines 
+sumas -- dažnai prie slaptažodžių pridedama papildoma informacija, kuri gali 
+būti saugoma duomenų bazėse arba šifruotų laikmenų antraštėse. Prieš 
+skaičiuojant slaptažodžio kontrolinę sumą, gera praktika yra prie slaptažodžio 
+pridėti papildomą informaciją, kaip pvz. vadinamoji \textquote{druska} (angl. 
 \textquote{salt}), skirta apsunkinti tam tikras slaptažodžių parinkimo atakas 
 (naudojant iš anksto suskaičiuotus slaptažodžių kontrolinių sumų sąrašus, angl. 
 \textquote{Rainbow Tables}). \textquote{Druska} dažnai būna atsitiktiniu būdu
 parinkta simbolių, raidžių ir skaičių seka, kuri yra saugoma kartu su galutine 
 slaptažodžio ir \textquote{druskos} kontroline suma. Kai vartotojas prisijungia 
 prie internetinės svetainės arba įveda kompiuterio skaitmeninės laikmenos 
-iššifravimo slaptažodį, įvestas slaptažodis yra sujungiamas su 
-\textquote{druska} ir palyginamas su turima kontroline suma. Tokio pavidalo 
-saugomus slaptažodžius yra sudėtingiau parinkti, kadangi \textquote{druskos} 
-reikšmės paprastai gali siekti net iki 32 simbolių ilgio. Šiame darbe 
-nagrinėjami slaptažodžio parinkimo metodai neįvertina \textquote{druskos}.
+iššifravimo slaptažodį, prie įvesto slaptažodio yra pridedama \textquote{druska} 
+ir junginys, apdorotas kriptografine maišos funkcija, yra lyginamas su turima 
+kontroline suma. Tokio pavidalo saugomus slaptažodžius yra sudėtingiau parinkti, 
+kadangi \textquote{druskos} reikšmės paprastai gali siekti net iki 32 
+atsitiktinai parinktų simbolių ilgio. Šiame darbe nagrinėjami slaptažodžio 
+parinkimo metodai neįvertina \textquote{druskos} reikšmės.
 
 \subsubsection{Mašininis mokymasis}
 Mašininis mokymasis, tame tarpe dirbtinis intelektas ir neuroniniai tinklai, 
 paprastai naudojami spręsti duomenų analizės, prognozavimo, klasifikavimo ar 
 naujų duomenų sintetinio generavimo problemas. Konkretus pritaikymas šiai 
 technologijai yra didiesiems duomenims (angl. \textquote{Big Data}) -- masinis 
-kiekis duomenų (nuo kelių šimtų megabaitų iki kelių šimtų gigabaitų ar daugiau) 
-gali būti naudojami prognozuoti rinkos tendencijas, žmonių elgesį, transformuoti 
-ir generuoti kitus duomenis apmokius kompiuterinį modelį įžvelgti paprastai 
-nematomus požymius duomenyse. Mašininiui mokymuisi yra reikalingi dideli duomenų 
-kiekiai siekiant sumažinti galimų klaidų skaičių, pagrindinis būdas tai atlikti 
-yra apmokyti mašininio mokymosi modelį su visomis (kuo daugiau) galimomis 
-įvesties reikšmėmis. Mašininio mokymosi modelis -- parametrų ir duomenų 
-rinkinys, kurie yra nustatomi, koreguojami ir/ar surenkami modelio apmokymo 
-procese, kuris yra taikomas spręsti aukščiau minėtas problemas.
-
-Internete paplitusios nutekintos slaptažodžių duomenų bazės yra laisvai 
-prieinami, dideli (nuo kelių šimtų megabaitų iki kelių šimtų gigabaitų) duomenų 
-rinkiniai, tinkami mašininio mokymosi metodų pritaikymui slaptažodžio 
-parinkimui.
+kiekis duomenų (nuo kelių šimtų megabaitų iki kelių šimtų gigabaitų, terabaitų 
+ar daugiau) gali būti naudojami rinkos tendencijų prognozavimui, žmonių elgesio 
+numatymui, transformuoti ir generuoti kitus duomenis apmokius kompiuterinį 
+modelį įžvelgti paprastai žmoniems nematomus požymius duomenyse. Mašininiui 
+mokymuisi yra reikalingi dideli duomenų kiekiai siekiant sumažinti galimų klaidų 
+skaičių. Pagrindinis būdas tai įgyvendinti yra apmokant mašininio mokymosi 
+modelį su visomis (arba kuo įmanoma daugiau) galimomis įvesties reikšmėmis. 
+Mašininio mokymosi modelis -- parametrų ir duomenų rinkinys, kurie yra 
+nustatomi, koreguojami ir/ar surenkami modelio apmokymo procese pagal 
+atitinkamai paruoštą neuroninį tinklą. Neuroninis tinklas yra mašininio mokymosi 
+modelio branduolys, paprastai sudarytas iš kelių skirtingų sluoksnių su 
+dirbtiniais neuronais, kuriose modelis apmokymo metu keičia parametrus pagal 
+įvesties duomenis ir vyksta informacijos (duomenų, signalų) perdavimas tarp 
+sluoksnių (neuronų). Mašininio mokymosi modelio parametrai yra keičiami 
+atsižvelgiant į mašininio mokymosi būdą. Mašininio mokymosi modelis po apmokymo 
+gali būti toliau taikomas spręsti aukščiau minėtas problemas.
 
 Išskiriami du pagrindiniai mašininio mokymosi proceso tipai:
 \begin{itemize}
@@ -196,34 +235,40 @@ Išskiriami du pagrindiniai mašininio mokymosi proceso tipai:
     duomenys, kuriuose algoritmas turi identifikuoti tokius reikšmingus 
     požymius, kad modelio priimami sprendimai sutaptų su mokytojo nustatytais 
     sprendimais.
-    Algoritmo pradiniai duomenyse kiekvienai reikšmei yra priskirta tam tikra 
-    žymė (asociacija), ir algoritmas duomenyse esamus požymius (pvz. forma, 
-    struktūra, pasiskirstymą, spalvą ir pan.) susieja su priskirta žyme. 
-    Mokymasis su mokytoju toliau gali būti skirstomi į du tipus:
+    Algoritmo pradiniuose duomenyse kiekvienai reikšmei yra priskirta tam tikra 
+    žymė (asociacija), ir algoritmas duomenyse esamus požymius (pvz. formą, 
+    struktūrą, pasiskirstymą, spalvą ir kt.) susieja su priskirta žyme. 
+    Mokymasis su mokytoju toliau gali būti skirstomi į du konkretesnius tipus:
     \begin{itemize}
-      \item klasifikacija -- priskirti duomenis prie tam tikros klasės, grupės;
-      \item regresija -- prognozuoti duomenis, priklausančius nuo kitų duomenų.
+      \item klasifikacija -- duomenų priskyrimas prie tam tikros klasės, grupės;
+      \item regresija -- duomenis prognozavimas priklausant nuo kitų duomenų.
     \end{itemize}
   \item be mokytojo (angl. \textquote{Unsupervised Learning}) -- mašininio 
-    mokymosi algoritmui yra pateikiami \textquote{žali} duomenys, t.y. ne 
-    klasifikuoti ar kitaip apdoroti, ir modelis turi pats identifikuoti, 
-    išskirti duomenyse reikšmingus požymius, ryšius. Mokymasis be mokytojo 
-    toliau gali būti skaidomas į du tipus:
+    mokymosi algoritmui yra pateikiami ne klasifikuoti ar kitaip apdoroti 
+    duomenys, ir modelis turi pats identifikuoti, išskirti duomenyse reikšmingus 
+    požymius, ryšius. Mokymasis be mokytojo toliau gali būti skaidomas į du 
+    tipus:
     \begin{itemize}
-      \item grupavimas -- reikšmių padalijimas į grupes, kurios turi panašius 
+      \item grupavimas -- duomenų padalijimas į grupes, kurios turi panašius 
         požymius;
-      \item asociacija -- taisyklėmis pagrįstas mokymasis, kuriame nustatomi 
-        tarpusavio ryšiai tarp reikšmių.
+      \item asociacija -- duomenyse nustatomi ryšiai tarp reikšmių pagal 
+        išmoktas taisykles.
     \end{itemize}
 \end{itemize}
 
+Internete paplitusios nutekintos slaptažodžių duomenų bazės yra laisvai 
+prieinami, dideli (nuo kelių šimtų megabaitų iki kelių šimtų gigabaitų) duomenų 
+rinkiniai, tinkami mašininio mokymosi metodų pritaikymui slaptažodžio 
+parinkimui. Mašininio mokymosi modelis gali atpažinti požymius apmokymui 
+pateiktų slaptažodžių aibėje ir, pagal juos, parinkti naujus slaptžodžius.
+
 \subsection{Brutalios jėgos metodas slaptažodžio parinkimui} 
 \label{sec:bruteforce}
-Vienas iš tradicinių, paprasčiausių būdų automatizuoto slaptažodžio parinkimui 
-yra brutalia jėga (angl. \textquote{Brute Force}), t.y. sugeneruoti visas 
-įmanomas slaptažodžių reikšmes nustatyto ilgio (ilgių intervale) su pasirinkta 
-simbolių (raidžių, skaitmenų ir specialių simbolių) aibe ir atlikti slaptažodžių 
-parinkimą pagal \ref{sec:cracking} skyriuje aprašytą metodiką.
+Vienas iš paprasčiausių būdų automatizuoto slaptažodžio parinkimui yra 
+vadinamoji \textquote{brutali jėga} (angl. \textquote{Brute Force}), t.y. 
+sugeneruoti visas įmanomas tam tikro ilgio (ilgių) slaptažodžių reikšmes su 
+pasirinkta simbolių (raidžių, skaitmenų ir specialių simbolių) aibe ir atlikti 
+slaptažodžių parinkimą pagal \ref{sec:cracking} skyriuje aprašytą metodiką.
 
 Pavyzdžiui, jei vartotojas turėtų iki 6 simbolių ilgio slaptažodį, tai programa 
 ar kompiuteris galėtų sugeneruoti visus įmanomus 1-6 simbolių ilgio 
@@ -238,33 +283,33 @@ sąraše, jei naudojamą simbolių aibę sudaro 95 simboliai, iš viso yra $95^6
 
 \begin{table}[hb]
   \centering
-  \begin{tabular}{|c|c|}
-    \hline \textbf{Ilgis} & \textbf{Kiekis} \\
-    \hline 1 & 95 \\
-    \hline 2 & 9025 \\
-    \hline 3 & 857375 \\
-    \hline 4 & 81450625 \\
-    \hline 5 & 7737809375 \\
-    \hline 6 & 735091890625 \\
-    \hline
-  \end{tabular}
   \caption{
     Slaptažodžių kiekių augimas priklausant nuo slaptažodžio ilgio, 95 simbolių 
     aibėje (\textquote{ASCII} koduotėje).
   }
+  \begin{tabular}{|c|c|}
+    \hline \textbf{Ilgis} & \textbf{Kiekis} \\
+    \hline 1 & 95 \\
+    \hline 2 & 8930 \\
+    \hline 3 & 830490 \\
+    \hline 4 & 76405080 \\
+    \hline 5 & 6952862280 \\
+    \hline 6 & 625757605200 \\
+    \hline
+  \end{tabular}
   \label{tab:bruteforce}
 \end{table}
 
 Atitinkamai paskaičiavus tokių duomenų kiekių, kaip pavaizduotų 
-\ref{tab:bruteforce} lent., talpą skaitmeninėje atmintyje (laikmenoje) pvz. 
+\ref{tab:bruteforce} lent., talpą skaitmeninėje atmintyje (laikmenoje), pvz. 
 visiems 6 simbolių ilgio slaptažodžiams, slaptažodžiai užimtų apie $3859$ 
 gigabaitų (su prielaida, kad simboliai yra \textquote{ASCII} koduotės ir 
-kiekvienas simbolis užima po 8 bitus).
-
+kiekvienas simbolis užima po 8 bitus). Eksperimentiniam bandymui 
 \textquote{Python} programine kalba parašytu scenarijumi, pateiktame 
 \ref{fig:permutacijos} pav., sugeneravau visas 5 simbolių permutacijas 
-(\textquote{ASCII} koduotėje) per $88.4$ minutes, kurios sudaro 6952862280 
-eilutes (slaptažodžius) ir užima $39$ gigabaitų talpos skaitmeninėje laikmenoje.
+(\textquote{ASCII} koduotėje) per $88.4$ minutes, kurios sudaro 
+$\frac{n!}{(n-r)!}=\frac{95!}{(95 - 5)!}=6952862280$ eilutes (slaptažodžius) ir 
+užima $34.76$ gigabaitų talpos skaitmeninėje laikmenoje.
 
 \begin{figure}
   \begin{center}
@@ -272,15 +317,21 @@ eilutes (slaptažodžius) ir užima $39$ gigabaitų talpos skaitmeninėje laikme
       language=Python,
       numbers=left
     ]{permutations.py}
-    \caption{Programinis kodas sugeneruoti visas 5 simbolių kombinacijas.}
+    \caption{
+      \textquote{Python} programavimo kalboje parašytas programinis kodas, 
+      skirtas sugeneruoti visas 5 simbolių kombinacijas.
+    }
     \label{fig:permutacijos}
   \end{center}
 \end{figure}
 
 Ilgesnius slaptažodžius, nei 6 simbolių ilgio, brutalios jėgos metodu parinkti 
-nebėra nei praktiška, nei realu, kadangi duomenų kiekiai išauga virš $4107$ 
-gigabaitų (su prielaida, kad simboliai yra \textquote{ASCII} koduotės ir 
-kiekvienas simbolis užima po 8 bitus).
+nebėra nei praktiška, nei realu. Paskaičiavus visas 6 simbolių permutacijas, 
+duomenys užimtų $3754.54$ gigabaitų talpos, o 7 simbolių permutacijas -- 
+$389.84$ terabaitų (su prielaida, kad simboliai yra \textquote{ASCII} koduotės 
+ir kiekvienas simbolis užima po 8 bitus). Tokius duomenų kiekius tiek generuoti, 
+tiek sutikrinti, užtruktų be galo ilgai, taip pat tampa per sudėtinga (brangu) 
+juos saugoti.
 
 \subsection{Slaptažodžių sąrašai slaptažodžio parinkimui} \label{sec:wordlists}
 Internete paplitusios vartotojų slaptažodžių nutekintos duomenų bazės yra 
@@ -292,31 +343,33 @@ informacinės saugos taisyklių ir gerųjų praktikų, tokių, kaip:
   \item nesaugoti slaptažodžius paprastu tekstu (angl. \textquote{Plain Text}), 
         o apdoroti slaptažodžius stipriomis kriptografinėmis maišos funkcijomis;
   \item su \textquote{druska} apsaugoti slaptažodžius nuo dažniausiai naudojamų 
-        atakų, kaip pateikta \ref{sec:hashing} skyriuje.
+        atakų, kaip aprašyta \ref{sec:hashing} skyriuje.
 \end{enumerate}
 
 Kai veikėjas (asmuo, programa) įsiveržia į tokias internetines svetaines ir 
 nutekina prisiregistravusių vartotojų asmeninius duomenis, tame tarpe ir 
-prisijungimo slaptažodžius, jie būna parduodami internete arba patalpinami 
-nemokamai laisvai prieinamuose internetinėse svetainėse.
-% TODO Gal įdėti pavyzdžių kokių nors populiariausių tokių wordlistų?
-Naudojantis šias duomenų bazes su vartotojų prisijungimo informacija, kiekvienas 
-slaptažodis yra apdorojamas maišos funkcija ir jos išvesta kontrolinė suma 
-palyginama su turimomis nežinomomis slaptažodžių kontrolinių sumomis.
+prisijungimo slaptažodžius, duomenys būna parduodami internete arba patalpinami 
+nemokamai laisvai prieinamuose internetinėse svetainėse. Naudojantis šias 
+duomenų bazes su vartotojų prisijungimo informacija, kiekvienas slaptažodis yra 
+apdorojamas maišos funkcija ir jos išvesta kontrolinė suma palyginama su 
+turimomis nežinomomis slaptažodžių kontrolinių sumomis siekiant nustatyti 
+vartotojų slaptažodžius, kuriuos vartotojai galimai pakartotinai panaudojo.
 
 \subsection{Slaptažodžių kontrolinių sumų sąrašai slaptažodžio parinkimui} 
 \label{sec:rainbowtables}
 Slaptažodžių apdorojimui į kontrolines sumas, naudojant kriptografines maišos 
 funkcijas, tokiais dideliais kiekiais, kaip nutekintų slaptažodžių duomenų 
-bazių, reikalingi dideli kompiuteriniai ištekliai. Siekiant minimizuoti laiką, 
-skirtą slaptažodžio parinkimui, nutekintos slaptažodžių duomenų bazės (ar jų 
-mišinio) slaptažodžiai yra iš anksto apdorojami kriptografinės maišos funkcijos 
-(toks metodas vadinamas angl. \textquote{Rainbow Tables}). Tokiu būdu, 
-slaptažodžio užpuolikui, siekiančiam nustatyti tikrąją slaptažodžio reikšmę, 
-reikia tik palyginti kontrolines sumas ir surasti, jei tokia yra, sutampančią. 
-Kaip minėta \ref{sec:hashing} skyriuje, tokio tipo ataka netinkama 
-slaptažodžiams, kurie yra apsaugoti su \textquote{druska}, kadangi kontrolinės 
-sumos skirtųsi net ir jeigu tikra slaptažodžio reikšmė sutampa.
+bazių, reikalingi dideli kompiuteriniai ištekliai. Siekiant sumažinti laiką ir 
+kompiuterinius resursurs, skirtus slaptažodžio parinkimui, nutekintos 
+slaptažodžių duomenų bazės (ar jų mišinio) slaptažodžiai yra iš anksto 
+apdorojami kriptografinės maišos funkcijos (toks metodas vadinamas angl. 
+\textquote{Rainbow Tables}). Tokiu būdu, slaptažodžio užpuolikui, siekiančiam 
+nustatyti tikrąją slaptažodžio reikšmę, reikia tik palyginti kontrolines sumas 
+ir surasti, jei tokia yra, sutampančią, ir pagal sutampančią kontrolinę sumą 
+patikrinti kurio slaptažodžio ji yra. Kaip minėta \ref{sec:hashing} skyriuje, 
+tokio tipo ataka netinkama slaptažodžiams, kurie yra apsaugoti su 
+\textquote{druska}, kadangi kontrolinės sumos skirtųsi net ir jeigu tikra 
+slaptažodžio reikšmė sutampa.
 
 Paminėtina, kad naudojantis tokiais sugeneruotais sąrašais, kaip pateikta 
 \ref{sec:bruteforce}, \ref{sec:wordlists} ir \ref{sec:rainbowtables} skyriuose, 
@@ -340,15 +393,15 @@ padalinant į dalis, siekiant pagreitinti slaptažodžio parinkimą.
 %   Programinės įrangos internetinė svetainė: \url{https://hashcat.net/hashcat/}.
 % }
 
-\subsection{Ankstesni darbai}
+\subsection{Naujausi automatizuoto slaptažodžių parinkimo metodai}
 Automatizuoto slaptažodžio parinkimo metodų srityje yra atlikti moksliniai 
 tyrimai, nagrinėjantys galimybes pritaikyti ir integruoti mašininį mokymąsi bei 
 kitus metodus, kad slaptažodžio parinkimo procesas sudėtingesniems, nei 1-6 
-simbolių ilgio slaptažodžiams, vyktų lengviau (greičiau). Šie metodai 
-automatizuotu būdu generuoja taisykles (požymius) iš pradinių duomenų (paprastai 
-naudojamos nutekintos slaptažodžių duomenų bazės), ir pagal sugeneruotas 
-taisykles (požymius) -- naujus slaptažodžius. Žemiau yra paminėti keli tokie 
-metodai:
+simbolių ilgio slaptažodžiams, vyktų lengviau ir/ar greičiau. Šie metodai 
+automatizuotu būdu išmoksta taisykles (požymius) iš pradinių duomenų (paprastai 
+naudojamos nutekintos slaptažodžių duomenų bazės), ir pagal atpažintas
+taisykles (požymius, bruožus, kuriuos žmonės naudoja savo slaptažodžių kūrime) 
+-- naujus slaptažodžius. Žemiau yra paminėti keli tokie metodai:
 \begin{enumerate}
   \item \textquote{PassGAN} -- paremtas mašininio mokymosi generatyviniais 
     konkurenciniais tinklais \cite{PassGAN};
@@ -362,11 +415,12 @@ metodai:
     \cite{TG-SPSR}.
 \end{enumerate}
 
-Peržiūrėjus aukščiau minėtus mokslinius darbus nuspręsta palyginti ir nagrinėti 
+Peržiūrėjus aukščiau minėtus mokslinius darbus, nuspręsta palyginti ir nagrinėti 
 \textquote{PassGAN} ir \textquote{PCFG} metodus, kadangi \textquote{PassGAN} 
-metodas naudoja tik mašininį mokymasį, \textquote{PCFG} metodas -- tik 
+metodas naudoja tik mašininį mokymasį, o \textquote{PCFG} metodas -- tik 
 statistinę analizę. Kiti metodai integruoja mašininį mokymasį, statistinę 
-analizę.
+analizę, kitų metodų naudojamus sprendimus, idėjas, ir šiame darbe norima 
+atlikti analizę savo sudėtimi labiau paprastesnių metodų.
 % Ne tik pasakyti ką atliko kiti autoriai, bet palyginti jų darbus, pateikti tų 
 % darbų pliusus ir minusus
 
@@ -379,10 +433,10 @@ analizę.
 % suprastu
 
 \subsubsection{\textquote{PassGAN} metodas}
-Šioje dalyje atliksiu apžvalgą generatyvinių konkurencinių tinklų (angl. 
-\textquote{Generative Adversarial Networks}), pagal kuriuos yra pagrįstas 
-\textquote{PassGAN} metodas, bei pateiksiu jų esminius automatizuoto 
-slaptažodžių parinkimo pritaikymo bruožus.
+Šioje dalyje yra apžvalga generatyvinių konkurencinių tinklų (angl. 
+\textquote{Generative Adversarial Networks}), kuriais yra pagrįstas 
+\textquote{PassGAN} metodas, bei yra pateikti jų esminiai automatizuoto 
+slaptažodžių parinkimo pritaikymo bruožai.
 
 % Kas yra GANai
 % Pritaikymas slaptažodžių parinkimo srityje
@@ -406,7 +460,7 @@ atskirti nuo realių (apmokymo) reikšmių, t.y. generavimo modelis apmokamas to
 kol neapgauna diskriminatoriaus modelio \cite{GAN}.
 
 Pagrindinis skirtumas tarp diskriminuojančio ir generatyvinio modeliavimo yra 
-tai, diskriminacinis modelis klasifikuoja -- turi būti priimtas sprendimas, 
+tai, kad diskriminacinis modelis klasifikuoja -- turi būti priimtas sprendimas, 
 kuriai klasei priklauso tam tikra reikšmė, o generatyvinis -- generuoja arba 
 sukuria naujas reikšmes pagal pradinius duomenis, kurie galėtų tikėtinai būti 
 pradiniame duomenų rinkinyje. Kitaip tariant, generatyvinis modelis gali būti 
@@ -432,16 +486,47 @@ duomenų aibės reikšmes nuo generuojamų reikšmių.
 
 \subsubsubsection{Neuroninių tinklų struktūros}
 Šiame metode naudojamas generatyvinis konkurencinis tinklas su struktūra, 
-paremta \cite{GAN}, kuri yra pateikta \ref{plot:passgang}, \ref{plot:passgand} 
-pav., ir \textquote{ADAM} optimizatorius \cite{ADAM} siekiant minimizuoti 
-apmokymo klaidą (angl. \textquote{Training Error}).
+paremta \textquote{IWGAN} \cite{GAN} straipsniu, ir \textquote{ADAM} 
+optimizatorius \cite{ADAM} siekiant minimizuoti apmokymo klaidą (angl. 
+\textquote{Training Error}).
 
+\textquote{IWGAN}, taip pat ir \textquote{PassGAN} metoduose, pagrindinė 
+neuroninio tinklo dalį sudaro likutiniai blokai (angl. \textquote{Residual 
+Block}), plačiai naudojami likutiniuose neuroniniuose tinkluose (angl. 
+\textquote{Residual Neural Network}, \textquote{ResNet}) \cite{ResNet}, skirtą 
+spręsti problemą, kai didėjant neuroninio tinklo sluoksniams didėja ir klaidos. 
+Naudojant kelis tokius likutinius blokus iš eilės (apjungtu su funkcija, 
+pavadinta \textquote{tapatybės funkcija}, arba angl. \textquote{Identity 
+Function}), klaida mažėja didėjant sluoksniams. Šie likutiniai blokai 
+\textquote{PassGAN} metode yra sudaryti iš vienmačių konvoliucinių sluoksnių, 
+sujungtų per \textquote{ReLU} aktyvinimo funkcijomis (angl. 
+\textquote{Activation Function}), žr. \ref{plot:passganblock} pav.
 
+\begin{figure}[!ht]
+  \begin{center}
+    \begin{tikzpicture}
+      \node[draw] (input) at (0, 0) {Input};
+      \node[draw, right=of input] (conv1d1) {Conv 1D};
+      \node[draw, right=of conv1d1] (conv1d2) {Conv 1D};
+      \node[draw, circle, right=of conv1d2] (sum) {+};
+      \node[draw, right=of sum] (output) {Output};
+      \draw[-stealth] (input.east) -- (conv1d1.west) node[midway,above] {ReLU};
+      \draw[-stealth] (conv1d1.east) -- (conv1d2.west) node[midway,above] {ReLU};
+      \draw[-stealth] (conv1d2.east) -- (sum.west) node[midway,above] {$* 0.3$};
+      \draw[-stealth] (sum.east) -- (output.west) node[midway,above] {};
+      \draw[-stealth] (input.north) edge[out=90,in=90,looseness=0.35] 
+      node[pos=0.3,midway,above] {Identity(Input)} (sum.north);
+    \end{tikzpicture}
+  \end{center}
+  \caption{
+    \textquote{PassGAN} metodo neuroninio tinklo sluoksnių vieno likutinio bloko 
+    sandara.
+  }
+  \label{plot:passganblock}
+\end{figure}
 
-
-Aprašyti neuroninio tinklo struktūrą, paaiškinti straipsnyje pasirinktus 
-sprendimus/priežastis, kokie parametrai ir koks optimizatorius naudojamas ir 
-kodėl.
+Pilna neuroninių tinklų struktūrą -- generatoriaus ir diskriminatoriaus tinklų 
+(modelių) -- pateikta priede \ref{add:passganarch}.
 
 \subsubsubsection{Pritaikymas slaptažodžių parinkimui}
 Generatyviniai konkurenciniai tinklai gali būti taikomi ir naujų slaptažodžių 
@@ -457,13 +542,12 @@ daugiau parenkamų slaptažodžių nežinomų slaptažodžių aibėje -- šio me
 moksliniame straipsnyje atliktas tyrimas parodo, kad modelis, apmokytas su 80 \% 
 \textquote{RockYou} nutekintos slaptažodžių duomenų bazės rinkinio slaptažodžių 
 aibe, testuojamas su 20 \% tos pačios duomenų bazės testavimo duomenų ir 
-\textquote{Linknedin} duomenų aibėmis, parenka slaptažodžius kiekiais, 
-apibrėžtais \ref{tab:passganoriginalrockyouresults}, 
-\ref{tab:passganoriginallinkedinresults} lent., kurioje matyti, kad su kuo 
-didesniu kiekiu sugeneruotų slaptažodžių, tuo didesnis yra parinktų slaptžodžių 
-skaičius testavimo duomenų aibėje. Pastebėtina, kad iš $10^10$ sugeneruotų 
-slaptažodžių tik $21.5282$ \% sudaro unikalios reikšmės, t.y. $78.4718$ \% visų 
-slaptažodžių yra dublikatai.
+\textquote{Linkedin} duomenų aibėmis, parenka slaptažodžius kiekiais, pateiktais 
+\ref{tab:passgan-original-results} lent., kurioje matyti, kad su kuo didesniu 
+kiekiu sugeneruotų slaptažodžių, tuo didesnis yra parinktų slaptžodžių skaičius 
+testavimo duomenų aibėje. Pastebėtina, kad iš $10^10$ sugeneruotų slaptažodžių 
+tik $21.5282$ \% sudaro unikalios reikšmės, t.y. $78.4718$ \% visų slaptažodžių 
+yra dublikatai.
 
 \begin{table}[hb]
   \centering
@@ -484,33 +568,14 @@ slaptažodžių yra dublikatai.
     \hline $10^{10}$ & 2152819961 & $26.036$ \% \\
     \hline
   \end{tabular}
-  \label{tab:passganoriginalrockyouresults}
+  \label{tab:passgan-original-results}
 \end{table}
 
-% \begin{table}[hb]
-%   \centering
-%   \caption{
-%     Slaptažodžių, sugeneruotų \textquote{PassGAN} metodu, apmokytų 80 \% 
-%     \textquote{RockYou} duomenų ir sutampančių su \textquote{Linkedin} testavimo 
-%     duomenų aibe \cite{PassGAN}.
-%   }
-%   \begin{tabular}{|c|c|}
-%     \hline \textbf{Slaptažodžių kiekis} & \textbf{Sutampančių slaptažodžių 
-%     kiekis} \\
-%     \hline $10^4$ & $0.005$ \% \\
-%     \hline $10^5$ & $0.048$ \% \\
-%     \hline $10^6$ & $0.381$ \% \\
-%     \hline $10^7$ & $2.038$ \% \\
-%     \hline $10^8$ & $6.726$ \% \\
-%     \hline $10^9$ & $15.094$ \% \\
-%     \hline $10^{10}$ & $26.036$ \% \\
-%     \hline
-%   \end{tabular}
-%   \label{tab:passganoriginallinkedinresults}
-% \end{table}
-
-Atlikus analizę \textquote{PassGAN} metodu sugeneruotų slaptažodžių dublikatų 
-kiekio, rezultatai pateikti \ref{plot:passganoriginalresults} pav.
+Atlikus analizę \textquote{PassGAN} metodo moksliniame straipsnyje pateiktų 
+sugeneruotų slaptažodžių dublikatų skaičių, pateiktų
+\ref{plot:passgan-original-duplicates} pav., nustatyta, kad didžioji dalis 
+sugeneruotų unikalių slaptažodžių yra nuo $10^4$-$10^7$, toliau daugiau nei 50 
+\% sudaro dublikatai.
 
 \begin{figure}[!ht]
   \begin{center}
@@ -544,7 +609,7 @@ kiekio, rezultatai pateikti \ref{plot:passganoriginalresults} pav.
   \caption{
     Unikalių slaptažodžių, sugeneruotų \textquote{PassGAN} metodu, kiekis.
   }
-  \label{plot:passganoriginalresults}
+  \label{plot:passgan-original-duplicates}
 \end{figure}
 
 \subsubsection{\textquote{PCFG} metodas}
@@ -684,6 +749,8 @@ reikšmė nepasiekia paskutinės grupės, arba nepasibaigia simbolių grupės
 
 \begin{figure}
   \begin{tikzpicture}[
+    scale=0.9,
+    every node/.style={scale=0.9},
     sibling distance=12em,
     every node/.style = {
       shape=rectangle,
@@ -727,8 +794,12 @@ slaptažodžių parinkimo proceso pradžioje.
 Algoritmas slaptažodžius parinks tik tokius, kurių gramatikos buvo užfiksuotos 
 apmokymui pateiktų slaptažodžių aibėje -- naujų gramatikų ir slaptažodžių formų 
 nėra.
-Kadangi \textquote{PCFG} algoritmas yra pagrįstas statistinėmis tikimybėmis, 
-reikalauja daug skaičiavimų.
+Kadangi \textquote{PCFG} straipsniuose \cite{PCFG1,PCFG2} yra naudojami kitokios 
+rezultatų įvertinimo/palyginimo metodologijos -- nėra sugeneruojami $10^n$ 
+slaptžodžių ir įvertinami, taip pat naudojamos kitos nutekintų slaptažodžių 
+duomenų bazės, negali būti efektyviai palygintas su \textquote{PassGAN} autorių 
+eksperimentais \cite{PassGAN}.
+% TODO: Paimti kitą DB tik įrodyti, kad algoritmas veikia panašiai?
 
 \section{Pagrindinė tiriamoji dalis}
 \subsection{Etika}
@@ -854,20 +925,21 @@ skaitmenų.
       ]
       \addplot
         table[x=length, y=count, col sep=comma, comment 
-        chars={~}]{myspace_length.csv};
+      chars={~}]{linkedin_length.csv};
       \end{axis}
     \end{tikzpicture}
   \end{center}
   \caption{
-    Nutekintos slaptažodžių duomenų bazės \textquote{myspace} įrašų ilgiai.
+    Nutekintos slaptažodžių duomenų bazės \textquote{Linkedin} įrašų ilgiai.
   }
-  \label{plot:myspacelength}
+  \label{plot:linkedinlength}
 \end{figure}
 
-Toliau atlikta nutekintų slaptažodžių duomenų bazių įrašų ilgių analizė, žr. 
-\ref{plot:rockyoulength}, \ref{plot:myspacelength} pav., parodo, kad daugiausia 
+Atlikta nutekintų slaptažodžių duomenų bazių įrašų ilgių analizė, žr. 
+\ref{plot:rockyoulength}, \ref{plot:linkedinlength} pav., parodo, kad daugiausia 
 vartotojų sukurtų slaptažodžių yra tarp 5-10 simbolių ilgio (slaptažodžiai, 
-ilgesni nei 32 simboliai, buvo atmesti pateiktuose vizualizacijose).
+ilgesni nei 16 simbolių, buvo atmesti pateiktuose vizualizacijose, kadangi jų 
+kiekiai buvo per maži).
 
 \subsection{Eksperimentuose taikoma strategija} \label{sec:strategy}
 Su pasirinktu automatizuoto slaptažodžių parinkimo metodu ir naudojant jo 
@@ -903,38 +975,39 @@ fiksuojamas kiekvienam sugeneruotų slaptažodžių rinkiniui.
 \subsection{\textquote{PassGAN} eksperimentų serija}
 Šioje dalyje atliekami eksperimentai su \textquote{PassGAN} metodo realizacija 
 \cite{PassGAN:impl}, generuojant slaptažodžių sąrašus pagal \ref{sec:strategy} 
-skyriuje aprašyta strategija. Apmokytas modelis su 80 \% \textquote{RockYou} 
-duomenų rinkiniu, ir, testuojant su 20 \% to paties duomenų rinkinio testavimo 
-duomenų aibe, rezultatai pateikti \ref{tab:passganrockyouresults} lent., kurioje 
-matyti panašūs rezultatai į \textquote{PassGAN} metodo mokslinio straipsnio 
-autoriaus rezultatus, pateiktus \ref{tab:passganoriginalresults} lent.
+skyriuje aprašyta strategija.
 
+\subsubsection{Eksperimentas su \textquote{RockYou} rinkiniu} % --------------- 
+\label{sec:pgrockyou}
 \begin{table}[hb]
   \centering
   \caption{
-    Slaptažodžių, sugeneruotų \textquote{PassGAN} metodu, apmokytų 80 \% 
-    \textquote{RockYou} duomenų ir sutampančių su \textquote{RockYou} testavimo 
-    duomenų aibe.
+    Slaptažodžių, sugeneruotų \textquote{PassGAN} metodo modeliu, apmokytu 80 \% 
+    \textquote{RockYou} duomenų, rezultatai testuojant su 20 \% 
+    \textquote{RockYou} testavimo duomenų aibe.
   }
-  \begin{tabular}{|c|c|c|}
-    \hline \textbf{Slaptažodžių kiekis} & \textbf{Unikalūs slaptažodžiai} & 
-    \textbf{Sutampančių slaptažodžių kiekis} \\
-    \hline $10^4$ & 9040 & $0.028584$ \% \\
-    \hline $10^5$ & 95295 & $0.254988$ \% \\
-    \hline $10^6$ & 885174 & $1.505298$\% \\
-    \hline $10^7$ & 7489667 & $5.285309$ \% \\
-    \hline $10^8$ & 57162878 & $12.358798$ \% \\
-    \hline $10^9$ & 390305149 & $21.805633$ \% \\
-    \hline $10^{10}$ & 2379342789 & $32.126489$ \% \\
+  \begin{tabular}{|c|c|c|c|}
+    \hline \textbf{Kiekis} & \textbf{Unikalūs} & \textbf{Sutampantys} & 
+    \textbf{Sutampantys (\%)} \\
+    \hline $10^4$ & 9040 & 1034 & $0.028584$ \% \\
+    \hline $10^5$ & 95295 & 9224 & $0.254988$ \% \\
+    \hline $10^6$ & 885174 & 54453 & $1.505298$ \% \\
+    \hline $10^7$ & 7489667 & 191192 & $5.285309$ \% \\
+    \hline $10^8$ & 57162878 & 447070 & $12.358798$ \% \\
+    \hline $10^9$ & 390305149 & 788802 & $21.805633$ \% \\
+    \hline $10^{10}$ & 2379342789 & 1162151 & $32.126489$ \% \\
     \hline
   \end{tabular}
-  \label{tab:passganrockyouresults}
+  \label{tab:passgan-rockyou-results}
 \end{table}
+Apmokytas modelis su 80 \% \textquote{RockYou} duomenų rinkiniu ir, pirmiausia, 
+atliktas testavimas su 20 \% to paties duomenų rinkinio testavimo duomenų aibe, 
+kurio rezultatai rezultatai pateikti \ref{tab:passgan-rockyou-results} lent.
 
-Atlikus analizę \textquote{PassGAN} metodu sugeneruotų slaptažodžių dublikatų 
-kiekio, rezultatai pateikti \ref{plot:passganrockyouresults} pav., kuriose taip 
-pat matyti panašūs dublikuotų slaptažodžių kiekiai, kaip pateikta 
-\ref{plot:passganoriginalresults} pav.
+Nustatyta, kad \ref{tab:passgan-rockyou-results} lent. pateikti duomenys rodo, 
+kad apmokyto modelio parinktų slaptažodžių skaičiai panašūs į 
+\textquote{PassGAN} metodo mokslinio straipsnio autoriaus rezultatus, pateiktus 
+\ref{tab:passgan-original-results} lent.
 
 \begin{figure}[!ht]
   \begin{center}
@@ -966,19 +1039,14 @@ pat matyti panašūs dublikuotų slaptažodžių kiekiai, kaip pateikta
     \end{tikzpicture}
   \end{center}
   \caption{
-    Unikalių slaptažodžių, sugeneruotų \textquote{PassGAN} metodu, kiekis.
+    Unikalių slaptažodžių, sugeneruotų \textquote{PassGAN} metodu, dalis.
   }
-  \label{plot:passganrockyouresults}
+  \label{plot:passgan-rockyou-duplicates}
 \end{figure}
-
-Palyginus \ref{tab:passganrockyouresults} lent. ir 
-\ref{plot:passganrockyouresults} pav. pateiktus rezultatus, kurie yra panašūs į 
-\textquote{PassGAN} mokslinio straipsnio rezultatus, atliktas palyginimas su 
-\textquote{PassGAN} mokslinio straipsnio autoriaus gautais rezultatais su tą 
-pačia nutekinta slaptažodžių duomenų baze -- \textquote{RockYou} (80 \% 
-slaptažodžių modelio apmokymui, likusieji 20 \% testavimui) -- kurio rezultatai 
-pateikti \ref{plot:passgancomparison} pav.
-
+Atlikus analizę \textquote{PassGAN} metodu sugeneruotų slaptažodžių dublikatų 
+dalies, nustatyta, kad yra panaši dublikuotų slaptažodžių dalis, kaip pateikta 
+\ref{plot:passgan-original-duplicates} pav. \textquote{PassGAN} autorių 
+pasiektuose rezultatuose.
 \begin{figure}[!ht]
   \begin{center}
     \begin{tikzpicture}
@@ -1024,47 +1092,596 @@ pateikti \ref{plot:passgancomparison} pav.
   \caption{
     Sutampančių su 20 \% \textquote{RockYou} duomenų rinkinio testavimo aibe 
     slaptažodžių dalis, palyginus su \textquote{PassGAN} mokslinio straipsnio 
-    autoriaus rezultatais.
+    autorių rezultatais.
   }
-  \label{plot:passgancomparison}
+  \label{plot:passgan-rockyou-comparison}
 \end{figure}
+Toliau atliktas palyginimas su \textquote{PassGAN} metodo autoriaus gautais 
+rezultatais su tą pačia nutekinta slaptažodžių duomenų baze -- 
+\textquote{RockYou} (80 \% slaptažodžių modelio apmokymui, likusieji 20 \% 
+testavimui) -- ir šiame darbe apmokyto modelio rezultatais, žr. 
+\ref{plot:passgan-rockyou-comparison} pav.
 
-Įvertinus \ref{plot:passgancomparison} pav. pateiktą informaciją, nustatyta, kad 
-iki $10^7$ sugeneruotų slaptažodžių, slaptažodžių kiekis, sutampantis su 
-testavimo duomenų aibe, sutampa (tarp 1-2 \%), o didesniems generuojamų 
-slaptažodžių kiekiams -- šiame darbe apmokytu modeliu maždaug 4-6 \% daugiau 
-slaptažodžių parenka. Toks slaptažodžių parinkimo tikslumo pakilimas yra 
-priskiriamas nutekintos slaptažodžių duomenų bazės \textquote{RockYou} 
+Įvertinus \ref{plot:passgan-rockyou-comparison} pav. pateiktą informaciją, 
+nustatyta, kad iki $10^8$ sugeneruotų slaptažodžių, slaptažodžių kiekis, 
+sutampantis su testavimo duomenų aibe, sutampa (1 \% tikslumu), o didesniems 
+generuojamų slaptažodžių kiekiams -- šiame darbe apmokytu modeliu maždaug 3-6 \% 
+daugiauslaptažodžių parenka. Toks slaptažodžių parinkimo tikslumo padidėjimas 
+yra priskiriamas nutekintos slaptažodžių duomenų bazės \textquote{RockYou} 
 išmaišymui prieš padalinant į apmokymo ir testavimo aibes. Slaptažodžiai, su 
 kuriais buvo testuojamas modelis aukščiau minėtame straipsnyje, galimai pateko į 
-apmokymo duomenų aibę šiame darbe, todėl parinkimo tikslumas neryškiai skiriasi.
+apmokymo duomenų aibę šiame darbe, todėl parinkimo tikslumas neryškiai skiriasi 
+(šiame darbe mokėsi iš kitų slaptažodžių, negu kokie buvo naudojami mokymui 
+straipsnyje, tačiau tai nustatyti reikėtų daugiau informacijos apie duomenų 
+rinkinio apdorojimą).
 
-Toliau, patikrinus sugeneruotus $10^4$-$10^{10}$ slaptažodžių sąrašus su 
-\textquote{Linkedin} testavimo duomenų rinkiniu, buvo atlikta analogiška 
-rezultatų analizė, kaip aukščiau, ir analizės rezultatai pateikti -- sutampančių 
-slaptažodžių kiekis procentais \ref{tab:passganlinkedinresults} lent.
-
+\subsubsection{Eksperimentas su \textquote{Linkedin} rinkiniu} % ---------------
 \begin{table}[hb]
   \centering
   \caption{
-    Slaptažodžių, sugeneruotų \textquote{PassGAN} metodu, apmokytų 80 \% 
-    \textquote{RockYou} duomenų ir sutampančių su \textquote{Linkedin} testavimo 
-    duomenų aibe.
+    Slaptažodžių, sugeneruotų \textquote{PassGAN} metodu modelio, apmokytu 80 \% 
+    \textquote{RockYou} duomenų, sugeneruotų slaptažodžių testavimas su visa
+    \textquote{Linked} testavimo duomenų aibe.
   }
-  \begin{tabular}{|c|c|c|}
-    \hline \textbf{Slaptažodžių kiekis} & \textbf{Unikalūs slaptažodžiai} & 
-    \textbf{Sutampančių slaptažodžių kiekis} \\
-    \hline $10^4$ & 9040 & $0.011684$ \% \\
-    \hline $10^5$ & 95295 & $0.103781$ \% \\
-    \hline $10^6$ & 885174 & $0.608665$ \% \\
-    \hline $10^7$ & 7489667 & $2.233555$ \% \\
-    \hline $10^8$ & 57162878 & $5.586419$ \% \\
-    \hline $10^9$ & 390305149 & $10.574647$ \% \\
-    \hline $10^{10}$ & 2379342789 & $16.681897$ \% \\
+  \begin{tabular}{|c|c|c|c|}
+    \hline \textbf{Kiekis} & \textbf{Unikalūs} & \textbf{Sutampantys} & 
+    \textbf{Sutampantys (\%)} \\
+    \hline $10^4$ & 9040 & 570 & $0.011684$ \% \\
+    \hline $10^5$ & 95295 & 5063 & $0.103781$ \% \\
+    \hline $10^6$ & 885174 & 29694 & $0.608665$\% \\
+    \hline $10^7$ & 7489667 & 108965 & $2.233145$ \% \\
+    \hline $10^8$ & 57162878 & 272536 & $5.586419$ \% \\
+    \hline $10^9$ & 390305149 & 515889 & $10.574647$ \% \\
+    \hline $10^{10}$ & 2379342789 & 813834 & $16.681897$ \% \\
     \hline
   \end{tabular}
-  \label{tab:passganlinkedinresults}
+  \label{tab:passgan-linkedin-results}
 \end{table}
+
+\begin{figure}[!ht]
+  \begin{center}
+    \begin{tikzpicture}
+      \begin{axis}[
+        xlabel={Sugeneruoti slaptažodžiai},
+        ylabel={Sutampantys slaptažodžiai},
+        x unit={vnt.},
+        y unit={\%},
+        ymin=0,
+        ymax=100,
+        xticklabels={,,$10^4$,$10^5$,$10^6$,$10^7$,$10^8$,$10^9$,$10^{10}$},
+        grid=major,
+        grid style={dashed,gray!30},
+        width=10cm,
+        height=7cm,
+      ]
+      \addplot coordinates {
+        (1, 0.011684)
+        (2, 0.103781)
+        (3, 0.608665)
+        (4, 2.233145)
+        (5, 5.586419)
+        (6, 10.574647)
+        (7, 16.681897)
+      };
+      \end{axis}
+    \end{tikzpicture}
+  \end{center}
+  \caption{
+    Sutampančių su visa \textquote{Linkedin} duomenų rinkinio testavimo aibe 
+    slaptažodžių dalis.
+  }
+  \label{plot:passgan-linkedin-results}
+\end{figure}
+\ref{sec:pgrockyou} skyriuje apmokytas modelis su 80 \% \textquote{RockYou} 
+duomenų rinkiniu yra toliau testuojamas su visa \textquote{Linkedin} duomenų 
+rinkinio slaptažodžių aibe, žr. \ref{tab:passgan-linkedin-results} lent., 
+\ref{plot:passgan-linkedin-results} pav. Palyginus šiuos rezultatus su 
+\ref{sec:pgrockyou} skyriaus rezultatais, parenkama maždaug per pus mažiau 
+slaptažodžių anksčiau nematytoje slaptažodžių duomenų bazėje -- tai gali nulemti 
+kitokios, anksčiau nematytos slaptažodžių formos, požymiai, kurie nebuvo arba 
+kurių neužteko apmokymo duomenų bazės slaptažodžiuose.
+
+\subsection{\textquote{PCFG} eksperimentų serija}
+Šioje dalyje atliekami eksperimentai su \textquote{PCFG} metodo realizacija 
+\cite{PCFG:impl}, generuojant slaptažodžių sąrašus pagal \ref{sec:strategy} 
+skyriuje aprašyta strategija.
+
+\subsubsection{Eksperimentas su \textquote{RockYou} rinkiniu} % ---------------
+\label{sec:pgpcfg}
+\begin{table}[hb]
+  \centering
+  \caption{
+    Slaptažodžių, sugeneruotų \textquote{PCFG} metodo modeliu, apmokytu 80 \% 
+    \textquote{RockYou} duomenų, rezultatai testuojant su 20 \% 
+    \textquote{RockYou} testavimo duomenų aibe.
+  }
+  \begin{tabular}{|c|c|c|c|}
+    \hline \textbf{Kiekis} & \textbf{Unikalūs} & \textbf{Sutampantys} & 
+    \textbf{Sutampantys (\%)} \\
+    \hline $10^4$ & 9997 & 9958 & $0.275279$ \% \\
+    \hline $10^5$ & 99952 & 97583 & $2.697583$ \% \\
+    \hline $10^6$ & 997955 & 549337 & $15.185866$ \% \\
+    \hline $10^7$ & 9984845 & 1160517 & $32.081319$ \% \\
+    \hline $10^8$ & 99822373 & 1622905 & $44.863567$ \% \\
+    \hline $10^9$ & 997519248 & 1966591 & $54.364419$ \% \\
+    % \hline $10^{10}$ & 9804626984 & 632609 & $17.487836$ \% \\
+    \hline $10^{10}$ & 9804626984 & 2071111 & $57.253791$ \% \\
+    \hline
+  \end{tabular}
+  \label{tab:pcfg-rockyou-results}
+\end{table}
+Apmokytas modelis su 80 \% \textquote{RockYou} duomenų rinkiniu ir, pirmiausia, 
+atliktas testavimas su 20 \% to paties duomenų rinkinio testavimo duomenų aibe, 
+kurio rezultatai rezultatai pateikti \ref{tab:pcfg-rockyou-results} lent.
+
+\begin{figure}[!ht]
+  \begin{center}
+    \begin{tikzpicture}
+      \begin{axis}[
+        ybar,
+        xlabel={Sugeneruoti slaptažodžiai},
+        ylabel={Unikalūs slaptažodžiai},
+        x unit={vnt.},
+        y unit={\%},
+        ymin=0,
+        ymax=100,
+        xticklabels={,,$10^4$,$10^5$,$10^6$,$10^7$,$10^8$,$10^9$,$10^{10}$},
+        grid=major,
+        grid style={dashed,gray!30},
+        width=10cm,
+        height=7cm,
+      ]
+      \addplot coordinates {
+        (1, 99.97)
+        (2, 99.952)
+        (3, 99.7955)
+        (4, 99.84845)
+        (5, 99.822373)
+        (6, 99.751925)
+        (7, 98.04627)
+      };
+      \end{axis}
+    \end{tikzpicture}
+  \end{center}
+  \caption{
+    Unikalių slaptažodžių, sugeneruotų \textquote{PCFG} metodu, dalis.
+  }
+  \label{plot:pcfg-rockyou-duplicates}
+\end{figure}
+Atlikus analizę \textquote{PCFG} metodu sugeneruotų slaptažodžių dublikatų 
+dalies, nustatyta, kad visuose sugeneruotuose $10^4$-$10^{10}$ slaptažodžių 
+sąrašuose yra beveik visi unikalūs slaptažodžiai.
+
+\begin{figure}[!ht]
+  \begin{center}
+    \begin{tikzpicture}
+      \begin{axis}[
+        xlabel={Sugeneruoti slaptažodžiai},
+        ylabel={Sutampantys slaptažodžiai},
+        x unit={vnt.},
+        y unit={\%},
+        ymin=0,
+        ymax=100,
+        xticklabels={,,$10^4$,$10^5$,$10^6$,$10^7$,$10^8$,$10^9$,$10^{10}$},
+        grid=major,
+        grid style={dashed,gray!30},
+        width=10cm,
+        height=7cm,
+      ]
+      \addplot coordinates {
+        (1, 0.275279)
+        (2, 2.697583)
+        (3, 15.185866)
+        (4, 32.081319)
+        (5, 44.863567)
+        (6, 54.364419)
+        % (7, 17.487836)
+        (7, 57.253791)
+      };
+      \end{axis}
+    \end{tikzpicture}
+  \end{center}
+  \caption{
+    Sutampančių su 20 \% \textquote{RockYou} duomenų rinkinio testavimo aibe 
+    slaptažodžių dalis.
+  }
+  \label{plot:pcfg-rockyou-results}
+\end{figure}
+Pagal \ref{tab:pcfg-rockyou-results} lent. ir \ref{plot:pcfg-rockyou-results} 
+pav. duomenis, nustatyta, kad geriausi rezultatai -- tarp 15-54 \% -- buvo 
+pasiekti $10^4$-$10^9$ sugeneruotų slaptažodžių aibėse. Pagal \textquote{PCFG} 
+metodo ypatybes, yra galimybė, kad generuojant jau $10^{10}$ slaptažodžių 
+sąrašą, geriausios reikšmės (slaptažodžiai su didžiausia tikimybe) buvo 
+išnaudotos, parinktos, ir liko visos žemesnių tikimybių reikšmės, kurios jau 
+nebepatenka į testavimo duomenų aibę.
+
+\subsubsection{Eksperimentas su \textquote{Linkedin} rinkiniu} % ---------------
+\begin{table}[hb]
+  \centering
+  \caption{
+    Slaptažodžių, sugeneruotų \textquote{PCFG} metodu modelio, apmokytu 80 \% 
+    \textquote{RockYou} duomenų, sugeneruotų slaptažodžių testavimas su visa
+    \textquote{Linked} testavimo duomenų aibe.
+  }
+  \begin{tabular}{|c|c|c|c|}
+    \hline \textbf{Kiekis} & \textbf{Unikalūs} & \textbf{Sutampantys} & 
+    \textbf{Sutampantys (\%)} \\
+    \hline $10^4$ & 9997 & 8681 & $0.177942$ \% \\
+    \hline $10^5$ & 99952 & 65646 & $1.345606$ \% \\
+    \hline $10^6$ & 997955 & 312668 & $6.409041$ \% \\
+    \hline $10^7$ & 9984845 & 691975 & $14.184042$ \% \\
+    \hline $10^8$ & 99822373 & 1155333 & $23.681913$ \% \\
+    \hline $10^9$ & 997519248 & 1580818 & $32.403466$ \% \\ 
+    % \hline $10^{10}$ & 9804626984 & 811776 & $16.639712$ \% \\
+    \hline $10^{10}$ & 9804626984 & 1681782 & $34.473021$ \% \\
+    \hline
+  \end{tabular}
+  \label{tab:pcfg-linkedin-results}
+\end{table}
+
+\begin{figure}[!ht]
+  \begin{center}
+    \begin{tikzpicture}
+      \begin{axis}[
+        xlabel={Sugeneruoti slaptažodžiai},
+        ylabel={Sutampantys slaptažodžiai},
+        x unit={vnt.},
+        y unit={\%},
+        ymin=0,
+        ymax=100,
+        xticklabels={,,$10^4$,$10^5$,$10^6$,$10^7$,$10^8$,$10^9$,$10^{10}$},
+        grid=major,
+        grid style={dashed,gray!30},
+        width=10cm,
+        height=7cm,
+      ]
+      \addplot coordinates {
+        (1, 0.177942)
+        (2, 1.345606)
+        (3, 6.409041)
+        (4, 14.184042)
+        (5, 23.681913)
+        (6, 32.403466)
+        (7, 34.473021)
+      };
+      \end{axis}
+    \end{tikzpicture}
+  \end{center}
+  \caption{
+    Sutampančių su visa \textquote{Linkedin} duomenų rinkinio testavimo aibe 
+    slaptažodžių dalis.
+  }
+  \label{plot:pcfg-linkedin-results}
+\end{figure}
+\ref{sec:pgpcfg} skyriuje apmokytas modelis su 80 \% \textquote{RockYou} duomenų 
+rinkiniu yra toliau testuojamas su visa \textquote{Linkedin} duomenų rinkinio 
+slaptažodžių aibe, žr. \ref{tab:passgan-linkedin-results} lent., 
+\ref{plot:passgan-linkedin-results} pav.
+
+\subsection{Eksperimentų rezultatų apžvalga}
+Šioje dalyje su \textquote{PassGAN} ir \textquote{PCFG} metodais atliktų
+eksperimentų rezultatai yra palyginami ir įvertinami. Diagramos, pateiktos 
+\ref{plot:passgan-rockyou-comparison}, \ref{plot:passgan-linkedin-results}, 
+\ref{plot:pcfg-rockyou-results}, \ref{plot:pcfg-linkedin-results} pav., yra 
+apjungtos patogesnei rezultatų peržiūrai abiems metodams į 
+\ref{plot:passgan-pcfg-rockyou-comparison}, 
+\ref{plot:passgan-pcfg-linkedin-comparison} pav. (žr. priedą
+\ref{add:methods-overview}). Palyginus šiuos rezultatus yra matyti, kad 
+\textquote{PCFG} metodas ženkliai daugiau slaptažodžių parenka už 
+\textquote{PassGAN} metodą -- maždaug 20-30 \% daugiau -- testuojant su 20 \% 
+\textquote{RockYou} duomenų rinkinio testavimo aibe. Kitą vertus, 
+\textquote{PassGAN} metodas parenka maždaug 16 \% daugiau slaptažodžių anksčiau 
+nematytame \textquote{Linkedin} duomenų rinkinyje už \textquote{PCFG} metodą.
+Taip pat paminėtina, kad \textquote{PCFG} metodas mažiau naujų slaptažodžių 
+parenka naudojant $10^{10}$ sugeneruotą slaptažodžių sąrašą ir įvertinant 
+parenkamų slaptažodžių kreivės augimą iki to taško. Tai gali nulemti kitokios, 
+anksčiau nematytos slaptažodžių formos, požymiai, kurie nebuvo arba kurių 
+neužteko apmokymo duomenų bazės slaptažodžiuose ir kurias metodas jau nebegali 
+parinkti -- visi aukštesnių tikimybių slaptažodžiai jau buvo parinkti.
+
+\begin{figure}[!ht]
+  \begin{center}
+    \begin{tikzpicture}
+      \begin{axis}[
+        ybar,
+        xlabel={Sugeneruoti slaptažodžiai},
+        ylabel={Unikalūs slaptažodžiai},
+        x unit={vnt.},
+        y unit={\%},
+        ymin=0,
+        ymax=100,
+        xticklabels={,,$10^4$,$10^5$,$10^6$,$10^7$,$10^8$,$10^9$,$10^{10}$},
+        grid=major,
+        grid style={dashed,gray!30},
+        width=10cm,
+        height=7cm,
+        legend style={at={(0.5,-0.25)}, anchor=north}
+      ]
+      \legend{
+        \textquote{PassGAN} metodas,
+        \textquote{PCFG} metodas
+      }
+      \addplot coordinates {
+        (1, 97.38)
+        (2, 94.4)
+        (3, 85.5972)
+        (4, 70.64483)
+        (5, 52.815412)
+        (6, 35.621683)
+        (7, 21.5282)
+      };
+      \addplot coordinates {
+        (1, 99.97)
+        (2, 99.952)
+        (3, 99.7955)
+        (4, 99.84845)
+        (5, 99.822373)
+        (6, 99.751925)
+        (7, 98.04627)
+      };
+      \end{axis}
+    \end{tikzpicture}
+  \end{center}
+  \caption{
+    Unikalių slaptažodžių, sugeneruotų \textquote{PassGAN} ir \textquote{PCFG} 
+    metodais, dalis.
+  }
+  \label{plot:passgan-pcfg-duplicates}
+\end{figure}
+Įvertinus abiejų metodų generuotų slaptažodžių duplikatų dalis (žr. 
+\ref{plot:passgan-pcfg-duplicates} pav.), nustatyta, kad su \textquote{PassGAN} 
+metodu taip pat sugeneruojami vis daugiau slaptažodžių, kurie buvo anksčiau 
+generuoti -- daugiau duplikatų nei unikalių slaptažodžių. Palyginus 
+\textquote{PassGAN} su \textquote{PCFG} metodu, \textquote{PCFG} generuojami 
+slaptažodžiai yra sudaryti beveik vien tik iš unikalių reikšmių -- 99 \%, tačiau 
+nusimato, kad, pradedant nuo $10^{10}$ -- 98 \% unikalių slaptažodžių -- bus 
+generuojama daugiau duplikatų.
+
+Siekiant nustatyti generuojamų ir parenkamų slaptažodžių ilgius bei perspektyvas 
+parinkti slaptažodžius ilgesnius, nei 6 simbolių, buvo atlikta generuojamų ir 
+parenkamų slaptažodžių ilgių analizė bendrai \textquote{PassGAN} ir 
+\textquote{PCFG} metodams (žr. \ref{plot:picked-lengths}). Analizė atlikta su 
+$10^8$ generuotais slaptažodžių sąrašais \textquote{RockYou} ir 
+\textquote{Linkedin} nutekintų slaptažodžių duomenų bazėms, ir pavaizduoti tik 
+5-16 simbolių ilgio slaptažodžiai, kurie sudarė didžiąją daugumą. Iš šios 
+analizės darau išvadą, kad šie metodai yra tinkami slaptažodžių, ilgesnių nei 6 
+simbolių, parinkimui, įvertinus \ref{sec:bruteforce}, \ref{sec:wordlists} ir 
+\ref{sec:rainbowtables} skyriuose minėtų dabar taikomų metodų apribojimus bei 
+praktinio pritaikymo sunkumus.
+\begin{figure}[!ht]
+  \begin{center}
+    \begin{tikzpicture}
+      \begin{axis}[
+        every node near coord/.append style={font=\tiny},
+        enlarge x limits=0.0625,
+        ybar stacked,
+        nodes near coords,
+        xtick=data,
+        xlabel={Ilgis},
+        ylabel={Kiekis},
+        y unit={simboliai},
+        x unit={vnt.},
+        width=\hsize,
+        height=7cm,
+      ]
+      \addplot
+        table[x=length, y=count, col sep=comma, comment 
+        chars={~}]{passgan_8_rockyou_length.csv};
+      \addlegendentry{
+        \textquote{PassGAN} su \textquote{RockYou}
+      }
+      \addplot
+        table[x=length, y=count, col sep=comma, comment 
+        chars={~}]{passgan_8_linkedin_length.csv};
+      \addlegendentry{
+        \textquote{PassGAN} su \textquote{Linkedin}
+      }
+
+      \addplot
+        table[x=length, y=count, col sep=comma, comment 
+        chars={~}]{pcfg_8_rockyou_length.csv};
+      \addlegendentry{
+        \textquote{PCFG} su \textquote{RockYou}
+      }
+      \addplot
+        table[x=length, y=count, col sep=comma, comment 
+        chars={~}]{pcfg_8_linkedin_length.csv};
+      \addlegendentry{
+        \textquote{PCFG} su \textquote{Linkedin}
+      }
+      \end{axis}
+    \end{tikzpicture}
+  \end{center}
+  \caption{
+    \textquote{PassGAN} ir \textquote{PCFG} metodų modelių parinktų slaptažodžių 
+    ilgiai duomenų bazėms \textquote{RockYou} (20 \% testavimo aibė) ir 
+    \textquote{Linkedin}.
+  }
+  \label{plot:picked-lengths}
+\end{figure}
+\sectionnonum{Išvados}
+% Ar atlikta studija sėkmingai išsprendė užsibrėžtą tikslą?
+% Kokie apribojimai buvo taikomi, kurie trukdė atlikti tyrimą?
+% Ar gauti rezultatai yra patikimi?
+% Ar buvo atliktas palyginimas su kitų autorių analogiškais rezultatais?
+% Kaip rezultatai gali būti panaudoti ateityje?
+% Kokio tipo naują informaciją/sprendimą/tyrimą galima pažymėti?
+% Kokias naujas idėjas ir pasiūlymus iškelia gauti rezultatai?
+Apibendrinant, atliktas automatizuoto slaptažodžių parinkimo metodų -- 
+\textquote{PassGAN} ir \textquote{PCFG} -- palyginimas sėkmingai išsprendė 
+užsibrėžtą tikslą. Metodų palyginimo metu nustatyta, kad yra galimybė pritaikyti
+šiuos metodus parinkti ilgesnius, nei 6 simbolių ilgio slaptažodžius, kuriuos 
+dabartiniai metodai sunkiai parenka dėl duomenų, duomenų kiekių ir kompiuterinių 
+resursų apribojimų. Tačiau šie metodai turi tam tikrus privalumus ir skirtumus 
+-- su \textquote{PCFG} metodo apmokytu modeliu parenkamas aukštesnis skaičius 
+slaptažodžių, panašių į apmokymui naudotus slaptažodžius, o \textquote{PassGAN} 
+-- su anksčiau nematytais slaptažodžiais. Svarbu paminėti, kad netgi ir taikant 
+šiuos metodus yra apribojimai, kurie gali trukdyti modelių apmokymui -- 
+reikalingas didelis kiekis slaptažodžių norint su aukštu tikslumu išmokyti 
+parinkti slaptažodžius teisingai, ir patys generuojami duomenų kiekiai yra 
+nemaži -- $10^{10}$ sugeneruotų slaptažodžių sąrašas užima bent 100 gigabaitų 
+skaitmeninės talpos. Praktikoje, atliekant baudžiamųjų bylų tyrimus, siekiant 
+nustatyti kaltę, paprastai nebūna pateikiami, aptinkami ar kitaip nustatomi 
+panašaus kiekio slaptažodžiai. Tyrimų metų, jei pasiseka -- tik keli 
+slaptažodžiai gali būti atrandami, pagal kuriuos reikėtų generuoti panašius 
+slaptažodžius. Išbandymas tokių automatizuoto slaptažodžių parinkimo metodų 
+pritaikymui mažesnių slaptažodžių kiekių generavimui, arba panašių, į turimų 
+slaptažodžių, generavimui, gali būti atidėtas tolimesniems tyrimams. Šiame darbe 
+pateikti palyginimo rezultatai gali būti naudojami ateityje praktiniame 
+baudžiamųjų bylų skaitmeninės informacijos ekspertiniuose tyrimuose, nustatant 
+šifruotų skaitmeninių laikmenų, mobiliųjų įrenginių apsaugos slaptažodžius, bei 
+tobulinti modelių slaptažodžių parinkimo tikslumą naudojant maišytas 
+slaptažodžių duomenų bazes, skirtingų kalbų bazes. Atsižvelgiant į atliktus 
+tyrimus nutekintų slaptažodžių duomenų bazių bei lyginamų metodų, yra galimybė, 
+kad slaptažodžiai laikui bėgant ilgės, žmonėms taikant informacinės saugos 
+rekomendacijas taps sudėtingesni, ir bus poreikis toliau inovuoti automatizuoto 
+slaptažodžių parinkimo mokslinėje srityje.
+
+\sectionnonum{Conclusions}
+In conclusion, the experiments performed with the \textquote{PassGAN} and 
+\textquote{PCFG} automated password guessing techniques have successfully completed 
+the assigned task. It is now evident that these techniques have the potential to 
+guess passwords that are longer than 6 characters in length, which the currently 
+used techniques struggle with due to the high data storage and computational 
+complexity requirements. However, these techniques do have certain benefits and 
+drawbacks -- a model trained with the \textquote{PCFG} method has the ability to 
+guess more passwords that are similar to those used in training, while the 
+\textquote{PassGAN} model performs better guessing passwords in previously 
+unseen data sets. Even using these techniques, data storage requirements can be 
+high with generated password lists of $10^{10}$ passwords using up to 100 
+gigabytes of space. In practice, during criminal proceedings and forensic 
+examinations, it is unusual to have a data set of enough passwords to adequately 
+train one of these models -- it is also unlikely that the investigator 
+performing the examination will be in possession of more than a few passwords 
+related to the accused, if they are uncooperative. Appling these password 
+guessing techniques to generate similar passwords to those already recovered by a 
+forensic examiner could be pursued in a future research. In this work, the 
+results obtained -- the trained models and generated data -- can be used in the 
+future in real digital information forensic examinations in order to guess 
+potential decryption or login passwords for computer hard drives or mobile 
+devices, as well as improving these models by mixing different password 
+datasets. Taking into consideration the performed analyses of the password 
+datasets and the automated password guessing techniques, it is a possibility that 
+with time passwords may become even longer and more complex as information 
+security and hygiene becomes a standard practice -- there will be a need for 
+further research into password guessing techniques.
+
+\printbibliography[heading=bibintoc]
+
+\appendix
+
+\section{\textquote{PassGAN} neuroninių tinklų sandaros} \label{add:passganarch}
+\begin{figure}[H]
+  \centering
+  \begin{subfigure}[b]{0.3\textwidth}
+    \centering
+    \begin{tikzpicture}
+      \node[draw] (input) at (0, 0) {Input Noise};
+      \node[draw, circle, below=of input] (linear) {Linear};
+      \node[draw, below=of linear] (resblock1) {Residual Block 1};
+      \node[draw, below=of resblock1] (resblock2) {Residual Block 2};
+      \node[draw, below=of resblock2] (resblock3) {Residual Block 3};
+      \node[draw, below=of resblock3] (resblock4) {Residual Block 4};
+      \node[draw, below=of resblock4] (resblock5) {Residual Block 5};
+      \node[draw, below=of resblock5] (conv1d) {Conv 1D};
+      \node[draw, circle, below=of conv1d] (softmax) {Softmax};
+      \node[draw, below=of softmax] (output) {Output};
+      \draw[-stealth] (input.south) -| (linear.north) node[midway,right] {};
+      \draw[-stealth] (linear.south) -| (resblock1.north) node[midway,right] 
+      {Reshape};
+      \draw[-stealth] (resblock1.south) -| (resblock2.north) node[]{};
+      \draw[-stealth] (resblock2.south) -| (resblock3.north) node[]{};
+      \draw[-stealth] (resblock3.south) -| (resblock4.north) node[]{};
+      \draw[-stealth] (resblock4.south) -| (resblock5.north) node[]{};
+      \draw[-stealth] (resblock5.south) -| (conv1d.north) node[]{};
+      \draw[-stealth] (conv1d.south) -| (softmax.north) node[]{Transpose 
+      Operation};
+      \draw[-stealth] (softmax.south) -| (output.north) node[]{};
+    \end{tikzpicture}
+    \caption{Generatoriaus neuroninio tinklo sandara.}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[b]{0.3\textwidth}
+    \centering
+    \begin{tikzpicture}
+      \node[draw] (input) at (0, 0) {Input};
+      \node[draw, below=of input] (conv1d) {Conv 1D};
+      \node[draw, below=of conv1d] (resblock1) {Residual Block 1};
+      \node[draw, below=of resblock1] (resblock2) {Residual Block 2};
+      \node[draw, below=of resblock2] (resblock3) {Residual Block 3};
+      \node[draw, below=of resblock3] (resblock4) {Residual Block 4};
+      \node[draw, below=of resblock4] (resblock5) {Residual Block 5};
+      \node[draw, circle, below=of resblock5] (linear) {Linear};
+      \node[draw, below=of linear] (output) {Output};
+      \draw[-stealth] (input.south) -| (conv1d.north) node[midway,right] {};
+      \draw[-stealth] (conv1d.south) -| (resblock1.north) node[midway,right] 
+      {Reshape};
+      \draw[-stealth] (resblock1.south) -| (resblock2.north) node[]{};
+      \draw[-stealth] (resblock2.south) -| (resblock3.north) node[]{};
+      \draw[-stealth] (resblock3.south) -| (resblock4.north) node[]{};
+      \draw[-stealth] (resblock4.south) -| (resblock5.north) node[]{};
+      \draw[-stealth] (resblock5.south) -| (linear.north) node[]{Reshape};
+      \draw[-stealth] (linear.south) -| (output.north) node[]{};
+    \end{tikzpicture}
+    \caption{Diskriminatoriaus neuroninio tinklo sandara.}
+  \end{subfigure}
+  \caption{
+    \textquote{PassGAN} metodo neuroniniai tinklai.
+  }
+\end{figure}
+
+\section{\textquote{PassGAN} ir \textquote{PCFG} metodų rezultatų apžvalga} 
+\label{add:methods-overview}
+\begin{figure}[!ht]
+  \begin{center}
+    \begin{tikzpicture}
+      \begin{axis}[
+        xlabel={Sugeneruoti slaptažodžiai},
+        ylabel={Sutampantys slaptažodžiai},
+        x unit={vnt.},
+        y unit={\%},
+        ymin=0,
+        ymax=100,
+        xticklabels={,,$10^4$,$10^5$,$10^6$,$10^7$,$10^8$,$10^9$,$10^{10}$},
+        grid=major,
+        grid style={dashed,gray!30},
+        width=10cm,
+        height=7cm,
+        legend style={at={(0.5,-0.25)}, anchor=north}
+      ]
+      \addplot coordinates {
+        (1, 0.028584)
+        (2, 0.254988)
+        (3, 1.505298)
+        (4, 5.285309)
+        (5, 12.358798)
+        (6, 21.805633)
+        (7, 32.126489)
+      };
+      \addplot coordinates {
+        (1, 0.275279)
+        (2, 2.697583)
+        (3, 15.185866)
+        (4, 32.081319)
+        (5, 44.863567)
+        (6, 54.364419)
+        (7, 57.253791)
+      };
+      \legend{
+        \textquote{PassGAN} metodas,
+        \textquote{PCFG} metodas
+      }
+      \end{axis}
+    \end{tikzpicture}
+    \caption{
+      Parinkti slaptažodžiai tarp \textquote{PassGAN} ir \textquote{PCFG} metodo 
+      modelių, apmokytų 80 \% \textquote{RockYou} nutekintos slaptažodžių duomenų 
+      bazės įrašų, testuojant su 20 \% to paties duomenų rinkinio testavimo 
+      duomenų aibės.
+    }
+    \label{plot:passgan-pcfg-rockyou-comparison}
+  \end{center}
+\end{figure}
 
 \begin{figure}[!ht]
   \begin{center}
@@ -1084,103 +1701,37 @@ slaptažodžių kiekis procentais \ref{tab:passganlinkedinresults} lent.
         legend style={at={(0.5,-0.25)}, anchor=north}
       ]
       \addplot coordinates {
+        (1, 0.028584)
+        (2, 0.254988)
+        (3, 1.505298)
+        (4, 5.285309)
+        (5, 12.358798)
+        (6, 21.805633)
+        (7, 32.126489)
+      };
+      \addplot coordinates {
         (1, 0.011684)
         (2, 0.103781)
         (3, 0.608665)
-        (4, 2.233555)
+        (4, 2.233145)
         (5, 5.586419)
         (6, 10.574647)
         (7, 16.681897)
       };
-      % SITUS REIKIA PAKEISTI
-      \addplot coordinates {
-        (1, 0.005)
-        (2, 0.048)
-        (3, 0.381)
-        (4, 2.038)
-        (5, 6.726)
-        (6, 15.094)
-        (7, 26.036)
-      };
       \legend{
-        Šio darbo skelbiami rezultatai,
-        Moksliniame straipsnyje skelbiami rezultatai
+        \textquote{PassGAN} metodas,
+        \textquote{PCFG} metodas
       }
       \end{axis}
     \end{tikzpicture}
+    \caption{
+      Parinkti slaptažodžiai tarp \textquote{PassGAN} ir \textquote{PCFG} metodo 
+      modelių, apmokytų 80 \% \textquote{RockYou} nutekintos slaptažodžių 
+      duomenų bazės įrašų, testuojant su viso \textquote{Linkedin} duomenų 
+      rinkinio testavimo duomenų aibe.
+    }
+    \label{plot:passgan-pcfg-linkedin-comparison}
   \end{center}
-  \caption{
-    Sutampančių su 20 \% \textquote{RockYou} duomenų rinkinio testavimo aibe 
-    slaptažodžių dalis, palyginus su \textquote{PassGAN} mokslinio straipsnio 
-    autoriaus rezultatais.
-  }
-  \label{plot:passgancomparison}
 \end{figure}
-\subsection{\textquote{PCFG} eksperimentų serija}
-Šioje dalyje atliekami eksperimentai su \textquote{PCFG} metodo realizacija 
-\cite{PCFG:impl}, generuojant slaptažodžių sąrašus pagal \ref{sec:strategy} 
-skyriuje aprašyta strategija.
-
-\begin{figure}[!ht]
-  \begin{center}
-    \begin{tikzpicture}
-      \begin{axis}[
-        xlabel={Sugeneruoti slaptažodžiai},
-        ylabel={Sutampantys slaptažodžiai},
-        ymax=100,
-        x unit={vnt.},
-        y unit={\%},
-        grid=major,
-        grid style={dashed,gray!30},
-        width=10cm,
-        height=7cm,
-        % legend style={at={(0.5,-0.5)}, anchor=north}
-      ]
-      \addplot[color=red, mark=*]
-        table[x=power of 10, y=matches, col sep=comma]{pcfg_ROCKYOU_80.csv};
-      % \addplot[color=blue, mark=*]
-      %   table[x=column 1, y=column 2, col sep=comma]{table2.csv};
-      % \legend{Case 1,Case 2}
-      \end{axis}
-    \end{tikzpicture}
-  \end{center}
-  \caption{
-    Sugeneruotų slaptažodžių, sutampančių su 20 \% testavimo duomenų rinkinyje 
-    esančiais slaptažodžiais, dalis.
-  }
-  \label{plot:kazkoks}
-\end{figure}
-
-\sectionnonum{Išvados}
-Išvadose ir pasiūlymuose, nekartojant atskirų dalių apibendrinimų,
-suformuluojamos svarbiausios darbo išvados, rekomendacijos bei pasiūlymai.
-% Ar atlikta studija sėkmingai išsprendė užsibrėžtą tikslą?
-% Kokie apribojimai buvo taikomi, kurie trukdė atlikti tyrimą?
-% Ar gauti rezultatai yra patikimi?
-% Ar buvo atliktas palyginimas su kitų autorių analogiškais rezultatais?
-% Kaip rezultatai gali būti panaudoti ateityje?
-% Kokio tipo naują informaciją/sprendimą/tyrimą galima pažymėti?
-% Kokias naujas idėjas ir pasiūlymus iškelia gauti rezultatai?
-
-\sectionnonum{Conclusions}
-Šiame skyriuje pateikiamos išvados (reziume) anglų kalba.
-
-\printbibliography[heading=bibintoc]
-
-\appendix  % Priedai
-% Prieduose gali būti pateikiama pagalbinė, ypač darbo autoriaus savarankiškai
-% parengta, medžiaga. Savarankiški priedai gali būti pateikiami kompiuterio
-% diskelyje ar kompaktiniame diske. Priedai taip pat vadinami ir numeruojami.
-% Tekstas su priedais siejamas nuorodomis (pvz.: \ref{img:mlp}).
-
-% \section{Niauroninio tinklo struktūra}
-% \begin{figure}[H]
-%     \centering
-%     \includegraphics[scale=0.5]{img/MLP}
-%     \caption{Paveikslėlio pavyzdys}
-%     \label{img:mlp}
-% \end{figure}
-
-\section{Eksperimentinio palyginimo rezultatai}
 
 \end{document}
