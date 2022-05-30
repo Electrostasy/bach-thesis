@@ -1636,53 +1636,77 @@ Atliktas automatizuoto slaptažodžių parinkimo metodų -- \textquote{PassGAN} 
 palyginimo metu nustatyta, kad yra galimybė pritaikyti šiuos metodus parinkant 
 ilgesnius, nei 6 simbolių ilgio slaptažodžius, kuriuos klasikinis pilno 
 perrinkimo ataka grįstas metodas ribotai gali parinkti, dėl duomenų kiekio ir 
-aparatinių kompiuterinių resursų. Tačiau šie metodai turi tam tikrus privalumus 
-ir skirtumus -- su \textquote{PCFG} metodo apmokytu modeliu parenkamas 
-aukštesnis skaičius slaptažodžių, panašių į apmokymui naudotus slaptažodžius, o 
-\textquote{PassGAN} -- su anksčiau nematytais slaptažodžiais. Svarbu paminėti, 
-kad netgi ir taikant šiuos metodus yra apribojimai, kurie gali trukdyti modelių 
-apmokymui -- reikalingas didelis kiekis slaptažodžių norint su aukštu tikslumu 
-išmokyti parinkti slaptažodžius teisingai, ir patys generuojami duomenų kiekiai 
-yra nemaži -- $10^{10}$ sugeneruotų slaptažodžių sąrašas užima bent 100 
-gigabaitų skaitmeninės talpos. Praktikoje, atliekant teismines informacinių 
-technologijų ekspertizes, siekiant nustatyti kaltę, paprastai nebūna pateikiami, 
-aptinkami ar kitaip nustatomi panašaus kiekio slaptažodžiai (kandidatai), tačiau 
-galima rasti informacijos apie vartotojus (tautybė, paskyrų pavadinimai, gimimo 
-data ir kitą asmeninė informaciją), kuri gali būti panaudota generuojant naujus 
-slaptažodžių kandidatus. Šiame darbe pateikti dviejų skirtingų metodų palyginimo 
-rezultatai gali būti naudojami ateityje praktiniuose informacinių technologijų 
-ekspertiniuose tyrimuose, nustatant šifruotų skaitmeninių laikmenų, mobiliųjų 
-įrenginių apsaugos slaptažodžius, bei tobulinti modelių slaptažodžių parinkimo 
-tikslumą naudojant maišytas slaptažodžių, bei skirtingų kalbų žodžių duomenų 
-bazes. Atsižvelgiant į atliktus tyrimus nutekintų slaptažodžių duomenų bazių bei 
+aparatinių kompiuterinių resursų.
+
+Šie metodai turi tam tikrus privalumus ir skirtumus -- su \textquote{PCFG} 
+metodo apmokytu modeliu parenkamas aukštesnis skaičius slaptažodžių, panašių į 
+apmokymui naudotus slaptažodžius, nei \textquote{PassGAN} metodas, kuriam 
+galimai reikia didesnio kiekio sugeneruotų slaptažodžių kandidatų sąrašų 
+pasiekti panašų parinkimo tikslumą. \textquote{PassGAN} metodu apmokytas modelis 
+generuoja daugiau pasikartojančių slaptažodžių, negu \textquote{PCFG} metodas, 
+kuris generuoja beveik tik unikalias reikšmes. Abiejų metodų parinkimo tikslumas 
+sumažėja testuojant su anksčiau nematytais slaptažodžiais, tačiau išlieka bent 
+$16$ \% (\textquote{PassGAN}) ir $34$ \% (\textquote{PCFG}) visos testavimo 
+duomenų aibės.
+
+Svarbu paminėti, kad netgi ir taikant šiuos metodus yra apribojimai, kurie gali 
+trukdyti modelių apmokymui -- reikalingas didelis kiekis slaptažodžių norint su 
+aukštu tikslumu išmokyti parinkti slaptažodžius teisingai, ir patys generuojami 
+duomenų kiekiai yra nemaži -- $10^{10}$ sugeneruotų slaptažodžių sąrašas užima 
+bent 100 gigabaitų skaitmeninės talpos. Praktikoje, atliekant teismines 
+informacinių technologijų ekspertizes, siekiant nustatyti kaltę, paprastai 
+nebūna pateikiami, aptinkami ar kitaip nustatomi panašaus kiekio slaptažodžiai 
+(kandidatai), tačiau galima rasti informacijos apie vartotojus (tautybė, paskyrų 
+pavadinimai, gimimo data ir kitą asmeninė informaciją), kuri gali būti panaudota 
+generuojant naujus slaptažodžių kandidatus.
+
+Šiame darbe pateikti dviejų skirtingų metodų palyginimo rezultatai gali būti 
+naudojami ateityje praktiniuose informacinių technologijų ekspertiniuose 
+tyrimuose, nustatant šifruotų skaitmeninių laikmenų, mobiliųjų įrenginių 
+apsaugos slaptažodžius, bei tobulinti modelių slaptažodžių parinkimo tikslumą 
+naudojant maišytas slaptažodžių, bei skirtingų kalbų žodžių duomenų bazes. 
+
+Atsižvelgiant į atliktus tyrimus nutekintų slaptažodžių duomenų bazių bei 
 lyginamų metodų eksperimentus, išlieka didelė galimybė, kad slaptažodžiai laikui 
 bėgant ilgės, žmonėms taikant informacinės saugos rekomendacijas taps 
 sudėtingesni, ir ateityje išliks poreikis toliau inovuoti automatizuoto 
 slaptažodžių parinkimo metodų mokslinėje srityje.
 
 \sectionnonum{Conclusions}
-In conclusion, the experiments performed with the \textquote{PassGAN} and 
-\textquote{PCFG} automated password guessing techniques have successfully 
-completed the assigned goal. It is now evident that these techniques have the 
-potential to guess passwords that are longer than six characters in length, 
-which the currently used techniques struggle with due to the high hardware and 
-computing requirements. However, these techniques do have certain benefits and 
-drawbacks -- a model trained with the \textquote{PCFG} method has the ability to 
-guess more passwords that are similar to those used in training, while the 
-\textquote{PassGAN} trained model performs better guessing passwords in 
-previously unseen data sets. Even using these techniques, data storage 
-requirements can be high with generated password lists of $10^{10}$ passwords 
-using up to 100 GB of space. In practice, during information technology forensic 
-examinations, conducted as part of different criminal proceedings to determine a 
-user's (suspect's) guilt, it is unusual to have a data set of enough passwords 
-to adequately train one of these models. However, during these examinations, it 
-is possible to locate and obtain information about the user (nationality, 
-account names, date of birth and other personal information) that could be used 
-in generating password candidates. In this work, the results obtained (trained 
-models and generated password candidates lists) can be used in the future in 
-information technology forensic examinations guessing potential decryption or 
-account login passwords for computers and mobile devices, as well as improving 
-these models by mixing different password datasets and language dictionaries. 
+The experiments performed with the \textquote{PassGAN} and \textquote{PCFG} 
+automated password guessing techniques have successfully completed the assigned 
+goal. It is now evident that these techniques have the potential to guess 
+passwords that are longer than six characters in length, which the currently 
+used techniques struggle with due to the high hardware and computing 
+requirements.
+
+These techniques do have certain benefits and drawbacks -- a model trained with 
+the \textquote{PCFG} method can guess more passwords than the 
+\textquote{PassGAN} trained model, comprised almost entirely of unique entries, 
+however, its password guessing accuracy begins to drop at $10^9$-$10^{10}$ 
+generated password candidates. While the \textquote{PassGAN} trained model has 
+lower overall accuracy, it does not follow the same trend and could potentially 
+match the \textquote{PCFG} model's accuracy with enough generated passwords. 
+Unlike the \textquote{PCFG} model, the \textquote{PassGAN} model generates many 
+duplicate entries at larger generated password counts. Both models' password 
+guessing accuracy drops to at least 16 \% (\textquote{PassGAN}) and 34 \% 
+(\textquote{PCFG}) of the whole testing dataset when testing with previously 
+unseen passwords.
+
+Even using these techniques, data storage requirements can be high with 
+generated password lists of $10^{10}$ passwords using up to 100 GB of space. In 
+practice, during information technology forensic examinations, conducted as part 
+of different criminal proceedings to determine a user's (suspect's) guilt, it is 
+unusual to have a data set of enough passwords to adequately train one of these 
+models. However, during these examinations, it is possible to locate and obtain 
+information about the user (nationality, account names, date of birth and other 
+personal information) that could be used in generating password candidates. In 
+this work, the results obtained (trained models and generated password 
+candidates lists) can be used in the future in information technology forensic 
+examinations guessing potential decryption or account login passwords for 
+computers and mobile devices, as well as improving these models by mixing 
+different password datasets and language dictionaries.
+
 Taking into consideration the performed experiments with the password datasets 
 and compared automated password guessing techniques, it remains likely that with 
 time passwords may become even longer and more complex as information security 
@@ -1711,7 +1735,7 @@ field in the future.
       \node[draw, circle, below=of conv1d] (softmax) {Softmax};
       \node[draw, below=of softmax] (output) {Output};
       \draw[-stealth] (input.south) -| (linear.north) node[midway,right] {};
-      \draw[-stealth] (linear.south) -| (resblock1.north) node[midway,right] 
+      \draw[-stealth] (linear.south) -| (resblock1.north) node[midway,below] 
       {Reshape};
       \draw[-stealth] (resblock1.south) -| (resblock2.north) node[]{};
       \draw[-stealth] (resblock2.south) -| (resblock3.north) node[]{};
@@ -1739,7 +1763,7 @@ field in the future.
       \node[draw, circle, below=of resblock5] (linear) {Linear};
       \node[draw, below=of linear] (output) {Output};
       \draw[-stealth] (input.south) -| (conv1d.north) node[midway,right] {};
-      \draw[-stealth] (conv1d.south) -| (resblock1.north) node[midway,right] 
+      \draw[-stealth] (conv1d.south) -| (resblock1.north) node[midway,below] 
       {Reshape};
       \draw[-stealth] (resblock1.south) -| (resblock2.north) node[]{};
       \draw[-stealth] (resblock2.south) -| (resblock3.north) node[]{};
