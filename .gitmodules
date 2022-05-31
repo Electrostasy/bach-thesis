@@ -1,3 +1,6 @@
 [submodule "passgan"]
 	path = passgan
-	url = https://github.com/Electrostasy/PassGAN
+	url = https://github.com/d4ichi/PassGAN
+[submodule "pcfg_cracker"]
+	path = pcfg_cracker
+	url = https://github.com/lakiw/pcfg_cracker
