@@ -68,6 +68,7 @@
 \newcommand{\institute}[1]{\def\@institute{#1}}
 \newcommand{\supervisor}[1]{\def\@supervisor{#1}}
 \newcommand{\reviewer}[1]{\def\@reviewer{#1}}
+\newcommand{\email}[1]{\def\@email{#1}}
 \newcommand{\status}[1]{\def\@status{#1}}
 \newcommand{\titleineng}[1]{\def\@titleineng{#1}}
 \newcommand{\secondauthor}[1]{\def\@secondauthor{#1}}
@@ -109,12 +110,8 @@
 }
 
 \renewcommand\maketitle{\begin{titlepage}%
-  \checkifdefined{@department}%
-    {Tituliniame puslapyje nenurodyta katedra (komanda \protect\department)}
-  \checkifdefined{@supervisor}%
-    {Tituliniame puslapyje nenurodytas darbo vadovas (komanda \protect\supervisor)}
-
   \begin{center}
+      \includegraphics[width=2.44cm,height=2.44cm]{mif.png}
       {\singlespacing \MakeUppercase{\@university} \\
                       \MakeUppercase{\@faculty} \\
                       \ifdefined\@institute
@@ -122,21 +119,21 @@
                       \fi
                       \MakeUppercase{\@department}\par }
       \null\vfil
-      \vskip 3.4cm
-      {\@papertype \par}%
-      {\singlespacing \Large \textbf{\@title}\\ {\large(\@titleineng)}\par}
+      \vskip 48pt
+      {\singlespacing \Large \textbf{\@title}\\ \vskip 6pt {\Large \textbf{\@titleineng}}\par}
+      {\singlespacing \@papertype \par}%
   \end{center}
   \@ifundefined{@secondauthor}{
      \vskip 4.9cm
      \begin{flushright}
         \singlespacing
         {\begin{tabular}[t]{l l}%
-          & \smallskip Atliko: \@status \\
-          & \medskip \@author \hfill \@signatureplace \\
-          & \smallskip Darbo vadovas: \\
-          & \medskip \@supervisor \hfill  \@signatureplace \\
-          & \smallskip Recenzentas: \\
-          & \@reviewer \hfill  \@signatureplace
+          & \smallskip Atliko: \@author \\
+          & \smallskip VU el. p.: \@email \\
+          % & \medskip \@author \hfill \@signatureplace \\
+          & \\
+          & \medskip Vadovas: \@supervisor \\
+          % & \medskip \@supervisor \hfill  \@signatureplace \\
         \end{tabular} \par}%
      \end{flushright}
      \vskip 2.9cm
@@ -150,8 +147,6 @@
           \bigskip & \@secondauthor \hfill \@signatureplace \\
           & \smallskip Darbo vadovas: \\
           & \bigskip \@supervisor \hfill  \@signatureplace \\
-          & \smallskip Recenzentas: \\
-          & \@reviewer \hfill  \@signatureplace
         \end{tabular} \par}%
      \end{flushright}
      \vskip 3cm
@@ -178,6 +173,7 @@
   \global\let\@papertype\@empty
   \global\let\@supervisor\@empty
   \global\let\@reviewer\@empty
+  \global\let\@email\@empty
   \global\let\title\relax
   \global\let\author\relax
   \global\let\date\relax

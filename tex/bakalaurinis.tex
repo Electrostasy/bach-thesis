@@ -30,15 +30,16 @@
 % Title page
 \university{Vilniaus universitetas}
 \faculty{Matematikos ir informatikos fakultetas}
-\institute{Duomenų mokslo ir skaitmeninių technologijų institutas}
-\department{Išmaniųjų technologijų tyrimų grupė}
+\institute{Informacinių sistemų inžinerijos studijų programa}
+\department{ }
 \papertype{Baigiamasis bakalauro darbas}
 \title{Naujausių automatizuoto slaptažodžių parinkimo metodų palyginimas}
-\titleineng{Comparison of the latest automated password guessing techniques}
-\status{4 kurso 1 grupės studentas}
+\titleineng{Comparison of the Latest Automated Password Guessing Techniques}
+%\status{4 kurso 1 grupės studentas}
 \author{Gediminas Valys}
+\email{gediminas.valys@mif.stud.vu.lt}
 \supervisor{prof. dr. Igoris Belovas}
-\reviewer{jaunesn. asist. Andrius Chaževskas}
+%\reviewer{jaunesn. asist. Andrius Chaževskas}
 \date{Vilnius \\ 2022}
 
 \setmainfont{Palemonas}
@@ -56,10 +57,10 @@
 
 \section{Santrauka}
 Šiame darbe palyginami du vieni iš naujausių automatizuoto slaptažodžių 
-parinkimo metodų, kurių paskirtis -- padėti nustatyti vartotojų slaptažodžius, 
+parinkimometodų, kurių paskirtis -- padėti nustatyti vartotojų slaptažodžius, 
 parenkant skirtingus slaptažodžių kandidatų sąrašus. Šie metodai gali būti 
 efektyviai pritaikyti atliekant teisminius informacinių technologijų 
-ekspertinius tyrimus (ekspertizes), vykdomus pagal skirtingas baudžiamasias 
+ekspertinius tyrimus (ekspertizes), vykdomus pagal skirtingas baudžiamąsias 
 bylas, siekiant nustatyti vartotojų (įtariamųjų) kaltę. Pagrindinės sritys, 
 kuriose gali būti taikomi šie metodai, būtų: vartotojų prisijungimo prie 
 operacinės sistemos paskyrų slaptažodžių parinkimas; šifruotų duomenų laikmenų 
@@ -70,26 +71,26 @@ lengvai parenkamų slaptažodžių. Nors viešoje erdvėje galime rasti daug
 rekomendacijų, kaip sukurti saugų slaptažodį (slaptažodžiuose nenaudoti savo 
 gimimo metų, vardo, pavardės, slapyvardžio bei kitų, su savimi susijusių, 
 žodžių), nutekintų slaptažodžių duomenų bazių tyrimai rodo, kad žmonėms būdinga, 
-kuriant slaptažodį, jį sugalvoti tokį, kad ateityje būtų galima jį
-prisiminti ir vėl įvesti. Nutekintą internetinių paslaugų vartotojų asmeninę 
-informaciją (slaptažodžius, vartotojų vardus ir kitą asmeninę informaciją) 
-galime rasti viešai prieinamose nutekintose slaptažodžių duomenų bazėse. Šiuose 
-duomenyse yra daugybė informacijos apie vartotojų slaptažodžių kūrimo metodikas 
-ir įpročius, tame tarpe ir kokie slaptažodžiai yra dažniausiai pasikartojantys. 
-Vienas dažniausiai naudojamų pilno perrinkimo slaptažodžių parinkimo metodų 
-ilgesnių nei 6 simbolių slaptažodžių su dabartiniu šifravimo algoritmų saugumo 
-lygiu yra labai apribotas techninių laboratorijų galimybių, todėl šiuo darbu 
-siekiama įvertinti naujausius slaptažodžių parinkimo metodus, kurie automatiškai 
+kuriant slaptažodį, jį sugalvoti tokį, kad ateityje būtų galima jį prisiminti ir 
+vėl įvesti. Nutekintą internetinių paslaugų vartotojų asmeninę informaciją 
+(slaptažodžius, vartotojų vardus ir kitą asmeninę informaciją) galime rasti 
+viešai prieinamose nutekintose slaptažodžių duomenų bazėse. Šiuose duomenyse yra 
+daugybė informacijos apie vartotojų slaptažodžių kūrimo metodikas ir įpročius, 
+tame tarpe ir kokie slaptažodžiai yra dažniausiai pasikartojantys. Vienas 
+dažniausiai naudojamų pilno perrinkimo slaptažodžių parinkimo metodų ilgesnių 
+nei 6 simbolių slaptažodžių su dabartiniu šifravimo algoritmų saugumo lygiu yra 
+labai apribotas techninių laboratorijų galimybių, todėl šiuo darbu siekiama 
+įvertinti naujausius slaptažodžių parinkimo metodus, kurie automatiškai 
 generuoja slaptažodžių kandidatų sąrašus, stengdamiesi išnaudoti viešai 
 prieinamus duomenis apie vartotojus -- nutekintas slaptažodžių duomenų bazes. 
 Atlikę eksperimentus, gavome rezultatus, rodančius, kad mūsų tirti slaptažodžių 
 parinkimo metodai gali būti taikomi slaptažodžių parinkimo strategijoje, 
 siekiant nustatyti (parinkti) ilgesnius, sudėtingesnius ir anksčiau nematytus 
-vartotojų slaptažodžius.
+vartotojų slaptažodžius
 
 \section{Summary}
 This work compares two of the latest automated password guessing techniques 
-intended for guessing user passwords by generating lists of password candidates. 
+intendedfor guessing user passwords by generating lists of password candidates. 
 These methods can be effectively applied in information technology forensic 
 examinations, conducted as part of different criminal proceedings to determine a 
 user's (suspect's) guilt. The main fields where these methods may be used 
@@ -111,24 +112,24 @@ password guessing techniques that automatically generate lists of password
 candidates, utilizing publicly available user information in leaked password 
 lists. In our experiments, our results show that our compared password guessing 
 techniques can be applied in the password guessing strategy with the intent to 
-guess longer, more complex and previously unseen user passwords.
+guess longer, more complex and previously unseen user passwords
 
 \section{Įvadas}
-Vartotojo autentikacija slaptažodžiu yra vienas iš pagrindinių kibernetinio 
-saugumo metodų. Teisminiuose informacinių technologijų tyrimuose, pagal 
-skirtingas baudžiamąsias bylas, siekiant nustatyti asmenų kaltę, skaitmeninės 
-informacijos specialistams (teismo ekspertams) užduodamos užduotys nuskaityti 
-kaltinamojo kompiuterių, mobiliųjų įrenginių informaciją ir atlikti informacijos 
-analizę, atsakant į užduotyse pateiktus klausimus. Tačiau jeigu įrenginys yra 
-apsaugotas skaitmeninės informacijos šifravimo priemonėmis, taip pat svarbu 
-nustatyti prisijungimo/apsaugos/iššifravimo slaptažodį -- kitaip informacijos 
-analizės atlikti nėra galimybės. Vykdant tokius tyrimus, kai reikia iššifruoti 
-skaitmeninę informacijos laikmeną arba prisijungti prie vartotojo internetinės 
-paskyros nežinant apsaugos slaptažodio, naudojami įvairūs slaptažodžių parinkimo 
-metodai, kuriais siekiama nustatyti apsaugos/prisijungimo slaptažodį. 
-Informacinių technologijų tyrimų teismo ekspertinėje praktikoje naudojami 
-metodai yra ribotų galimybių, pvz. pilno perrinkimo būdu ilgesnius nei 6 
-simbolių ilgio slaptažodžius nustatyti praktiškai neįmanoma dėl eksponentiškai 
+Vartotojo autentifikacija slaptažodžiu yra vienas iš pagrindinių 
+kibernetiniosaugumo metodų. Teisminiuose informacinių technologijų tyrimuose, 
+pagal skirtingas baudžiamąsias bylas, siekiant nustatyti asmenų kaltę, 
+skaitmeninės informacijos specialistams (teismo ekspertams) užduodamos užduotys 
+nuskaityti kaltinamojo kompiuterių, mobiliųjų įrenginių informaciją ir atlikti 
+informacijos analizę, atsakant į užduotyse pateiktus klausimus. Tačiau jeigu 
+įrenginys yra apsaugotas skaitmeninės informacijos šifravimo priemonėmis, taip 
+pat svarbu nustatyti prisijungimo/apsaugos/iššifravimo slaptažodį -- kitaip 
+informacijos analizės atlikti nėra galimybės. Vykdant tokius tyrimus, kai reikia 
+iššifruoti skaitmeninę informacijos laikmeną arba prisijungti prie vartotojo 
+internetinės paskyros nežinant apsaugos slaptažodžio, naudojami įvairūs 
+slaptažodžių parinkimo metodai, kuriais siekiama nustatyti apsaugos/prisijungimo 
+slaptažodį. Informacinių technologijų tyrimų teismo ekspertinėje praktikoje 
+naudojami metodai yra ribotų galimybių, pvz. pilno perrinkimo būdu ilgesnius nei 
+6 simbolių ilgio slaptažodžius nustatyti praktiškai neįmanoma dėl eksponentiškai 
 augančio slaptažodžių parinkimo užduoties sudėtingumo bei duomenų kiekių, o 
 standartiniuose slaptažodžių sąrašuose (pvz. nacionalinės kalbos žodynai) 
 tikimybė, kad ieškomas slaptažodis bus rastas, yra maža, dėl mažo slaptažodžių 
@@ -150,12 +151,12 @@ persidengiančių su nežinomų (ieškomų) slaptažodžių aibe, kiekis.
 \section{Literatūros apžvalga}
 \subsection{Pagrindinės idėjos}
 Šioje dalyje siekiama aptarti pagrindines mintis, idėjas, kurios suteikia 
-konteksto probleminei sričiai ir kuriomis vadovaujantis veikia slaptažodžio
+konteksto probleminei sričiai ir kuriomis vadovaujantis veikia slaptažodžių 
 parinkimo metodai. Kiekvienas nagrinėjamas automatizuotas slaptažodžio parinkimo 
 metodas yra pagrįstas bendresnių mokslinių, technologinių pažengimų, ir yra 
 konkretus jų pritaikymas slaptažodžio parinkimo problemos sprendimui, dėl to 
 metodo veikimo principo apžvalgai yra reikalingos žemiau minimi procesai ir 
-sprendimai.
+sprendimai
 
 \subsubsection{Slaptažodžių parinkimo procesas} \label{sec:cracking}
 Slaptažodžių parinkimas šnekamojoje kalboje taip pat vadinamas 
